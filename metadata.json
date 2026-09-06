@@ -1,0 +1,6 @@
+{
+  "name": "KisanSetu - Smart Farmer Procurement Management System",
+  "description": "A modern digital platform for farmers to discover procurement schedules, book slots, track live queues, monitor crop verification, and follow payments transparently.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
