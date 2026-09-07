@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAdminAuth } from '../context/AdminContext';
+import { useAdminAuth } from '../../context/AdminContext';
 import { ShieldCheck, User, Lock, KeyRound, Monitor, Smartphone, CheckCircle2, AlertCircle, LogOut, ShieldAlert, Award } from 'lucide-react';
 
 export const AdminProfilePage: React.FC = () => {
@@ -40,7 +40,7 @@ export const AdminProfilePage: React.FC = () => {
       <div className="bg-[#123D24] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#256035] mb-8 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center space-x-5">
-            <div className="w-20 h-20 rounded-2xl bg-[#1B4D2A] border-2 border-[#8EB773] p-1 overflow-hidden shadow-inner flex-shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-[#1B4D2A] border-2 border-[#8EB773] p-1 overflow-hidden shadow-inner shrink-0">
               <img
                 src={adminUser.profilePhoto}
                 alt={adminUser.fullName}

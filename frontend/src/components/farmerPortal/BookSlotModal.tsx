@@ -28,8 +28,8 @@ import {
   Check,
 } from "lucide-react";
 
-import { useAuth, MSP_RATES } from "../context/AuthContext";
-import type { CropType, QueueToken } from "../types";
+import { useAuth, MSP_RATES } from "../../context/AuthContext";
+import type { CropType, QueueToken } from "../../types";
 
 /* =========================================================
    TYPES

@@ -17,9 +17,9 @@ import {
   X,
 } from "lucide-react";
 
-import { useAuth } from "../context/AuthContext";
-import type { ProcurementSlot, QueueToken } from "../types";
-import BookSlotModal from "../components/BookSlotModal";
+import { useAuth } from "../../context/AuthContext";
+import type { ProcurementSlot, QueueToken } from "../../types";
+import BookSlotModal from "../../components/farmerPortal/BookSlotModal";
 
 /* =========================================================
    WEST BENGAL DISTRICTS

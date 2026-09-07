@@ -11,8 +11,8 @@ import {
   Receipt,
   Sparkles
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { CropType } from '../types';
+import { useAuth } from '../../context/AuthContext';
+import { CropType } from '../../types';
 
 export const PaymentTrackingSection: React.FC = () => {
   const { t, payments } = useAuth();

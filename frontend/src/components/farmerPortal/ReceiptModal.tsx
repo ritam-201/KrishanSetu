@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueueToken, PaymentTransaction } from '../types';
+import { QueueToken, PaymentTransaction } from '../../types';
 import {
   Printer,
   CheckCircle2,
@@ -14,7 +14,7 @@ import {
   CalendarDays,
   FileCheck2,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface ReceiptModalProps {
   token?: QueueToken;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, QrCode, Printer, Download, CheckCircle, Wheat, MapPin, Calendar, Clock, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { QueueToken } from '../types';
+import { useAuth } from '../../context/AuthContext';
+import { QueueToken } from '../../types';
 
 interface MandiPassModalProps {
   isOpen: boolean;

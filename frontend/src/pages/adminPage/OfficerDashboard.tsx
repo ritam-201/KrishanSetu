@@ -14,7 +14,7 @@ import {
   Building2,
   Users
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const OfficerDashboard: React.FC = () => {
   const {

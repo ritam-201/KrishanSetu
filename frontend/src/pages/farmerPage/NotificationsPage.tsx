@@ -15,8 +15,8 @@ import {
   X,
 } from "lucide-react";
 
-import { useAuth } from "../context/AuthContext";
-import type { AppNotification } from "../types";
+import { useAuth } from "../../context/AuthContext";
+import type { AppNotification } from "../../types";
 
 type NotificationFilter =
   | "all"

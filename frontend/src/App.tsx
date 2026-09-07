@@ -7,24 +7,24 @@ import { Footer } from './components/Footer';
 
 // Pages
 import { HomePage } from './pages/HomePage';
-import  FarmerDashboard  from './pages/FarmerDashboard';
-import { FarmerProfilePage } from './pages/FarmerProfilePage';
-import { ProcurementSchedulePage } from './pages/ProcurementSchedulePage';
-import { QueueTrackingPage } from './pages/QueueTrackingPage';
-import { ProcurementStatusPage } from './pages/ProcurementStatusPage';
-import { PaymentStatusPage } from './pages/PaymentStatusPage';
-import  NotificationsPage  from './pages/NotificationsPage';
-import { OfficerDashboard } from './pages/OfficerDashboard';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { AdminLoginPage } from './pages/AdminLoginPage';
-import { AdminProfilePage } from './pages/AdminProfilePage';
-import { AdminManagementPage } from './pages/AdminManagementPage';
+import  FarmerDashboard  from './pages/farmerPage/FarmerDashboard';
+import { FarmerProfilePage } from './pages/farmerPage/FarmerProfilePage';
+import { ProcurementSchedulePage } from './pages/farmerPage/ProcurementSchedulePage';
+import { QueueTrackingPage } from './pages/farmerPage/QueueTrackingPage';
+import { ProcurementStatusPage } from './pages/farmerPage/ProcurementStatusPage';
+import { PaymentStatusPage } from './pages/farmerPage/PaymentStatusPage';
+import  NotificationsPage  from './pages/farmerPage/NotificationsPage';
+import { OfficerDashboard } from './pages/adminPage/OfficerDashboard';
+import { AdminDashboard } from './pages/adminPage/AdminDashboard';
+import { AdminLoginPage } from './pages/adminPage/AdminLoginPage';
+import { AdminProfilePage } from './pages/adminPage/AdminProfilePage';
+import { AdminManagementPage } from './pages/adminPage/AdminManagementPage';
 import { LoginPage } from './pages/LoginPage';
-import  RegisterPage  from './pages/RegisterPage';
+import  RegisterPage  from './pages/farmerPage/RegisterPage';
 
 // Components
-import { AiAssistant } from './components/AiAssistant';
-import { OfflineBanner } from './components/OfflineBanner';
+import { AiAssistant } from './components/farmerPortal/AiAssistant';
+import { OfflineBanner } from './components/farmerPortal/OfflineBanner';
 import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 
 // Scroll to top helper on navigation

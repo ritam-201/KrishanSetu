@@ -28,13 +28,15 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
-import { useAuth, MSP_RATES } from "../context/AuthContext";
+import { useAuth, MSP_RATES } from "../../context/AuthContext";
 
-import { MandiPassModal } from "../components/MandiPassModal";
-import BookSlotModal from "../components/BookSlotModal";
-import { ReceiptModal } from "../components/ReceiptModal";
+import { MandiPassModal } from "../../components/farmerPortal/MandiPassModal";
 
-import type { CropType, PaymentTransaction, QueueToken } from "../types";
+import BookSlotModal from "../../components/farmerPortal/BookSlotModal";
+
+import { ReceiptModal } from "../../components/farmerPortal/ReceiptModal";
+
+import type { CropType, PaymentTransaction, QueueToken } from "../../types";
 
 /* =========================================================
    HELPERS

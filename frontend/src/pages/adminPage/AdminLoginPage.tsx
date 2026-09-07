@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../context/AdminContext';
+import { useAdminAuth } from '../../context/AdminContext';
 import { ShieldCheck, Eye, EyeOff, Lock, Mail, AlertTriangle, CheckCircle2, ArrowRight, KeyRound, Key, Sparkles } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
@@ -81,14 +81,14 @@ export const AdminLoginPage: React.FC = () => {
           {/* Notifications / Alerts */}
           {errorMsg && (
             <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold flex items-center space-x-2.5 animate-shake">
-              <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {lockedMsg && (
             <div className="mb-5 p-4 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs font-semibold flex items-start space-x-2.5">
-              <Lock className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+              <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold">Account Locked</p>
                 <p className="text-[11px] mt-0.5 text-amber-800">{lockedMsg}</p>
@@ -98,7 +98,7 @@ export const AdminLoginPage: React.FC = () => {
 
           {successMsg && (
             <div className="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center space-x-2.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}

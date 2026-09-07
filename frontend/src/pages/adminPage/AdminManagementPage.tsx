@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAdminAuth } from '../context/AdminContext';
-import { AdminUser, AdminRole } from '../types';
+import { useAdminAuth } from '../../context/AdminContext';
+import { AdminUser, AdminRole } from '../../types';
 import { ShieldCheck, UserPlus, Lock, Unlock, UserX, CheckCircle2, AlertCircle, ShieldAlert, Edit3, X } from 'lucide-react';
 
 export const AdminManagementPage: React.FC = () => {

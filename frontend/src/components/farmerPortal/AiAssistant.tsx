@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   Bot,
   Mic,
@@ -374,7 +374,7 @@ export const AiAssistant: React.FC = () => {
       {/* AI Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 p-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2.5 border border-emerald-400/30"
+        className="fixed bottom-6 right-6 z-40 p-4 bg-linear-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2.5 border border-emerald-400/30"
         title="Open AI Farmer Assistant"
       >
         <Bot className="w-6 h-6 animate-pulse" />
@@ -396,7 +396,7 @@ export const AiAssistant: React.FC = () => {
           <div className="bg-white w-full max-w-md h-full flex flex-col shadow-2xl border-l border-slate-200">
             
             {/* Header */}
-            <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 flex items-center justify-between shadow">
+            <div className="bg-linear-to-r from-emerald-800 to-teal-900 text-white p-4 flex items-center justify-between shadow">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-emerald-500/20 rounded-xl border border-emerald-400/30">
                   <Sparkles className="w-5 h-5 text-emerald-300" />

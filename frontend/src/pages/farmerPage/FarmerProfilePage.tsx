@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { DetailedFarmerProfile, CropDetail, CropType } from '../types';
+import { useAuth } from '../../context/AuthContext';
+import { DetailedFarmerProfile, CropDetail, CropType } from '../../types';
 import {
   User,
   ShieldCheck,

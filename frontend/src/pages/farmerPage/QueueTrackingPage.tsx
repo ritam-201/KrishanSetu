@@ -21,7 +21,7 @@ import {
   Wheat,
   RefreshCw,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export const QueueTrackingPage: React.FC = () => {
   const [isAudioMuted, setIsAudioMuted] = useState(false);

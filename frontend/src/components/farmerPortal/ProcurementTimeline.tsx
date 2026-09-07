@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Clock, CircleDot, AlertCircle, FileText, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const ProcurementTimeline: React.FC = () => {
   const { milestones, isAuthenticated, user } = useAuth();

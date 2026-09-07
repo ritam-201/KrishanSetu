@@ -12,8 +12,8 @@ import {
   Filter,
   Phone
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { ProcurementCenter } from '../types';
+import { useAuth } from '../../context/AuthContext';
+import { ProcurementCenter } from '../../types';
 
 export const CenterFinder: React.FC<{ onSelectCenterForBooking?: (center: ProcurementCenter) => void }> = ({
   onSelectCenterForBooking

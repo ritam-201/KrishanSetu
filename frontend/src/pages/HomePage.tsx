@@ -5,18 +5,18 @@ import { StatsBar } from "../components/StatsBar";
 import { ProblemSolution } from "../components/ProblemSolution";
 import { SmartSolutions } from "../components/SmartSolutions";
 import { HowItWorks } from "../components/HowItWorks";
-import { CenterFinder } from "../components/CenterFinder";
-import { LiveQueueHero } from "../components/LiveQueueHero";
+import { CenterFinder } from "../components/farmerPortal/CenterFinder";
+import { LiveQueueHero } from "../components/farmerPortal/LiveQueueHero";
 import { DashboardPreview } from "../components/DashboardPreview";
-import { ProcurementTimeline } from "../components/ProcurementTimeline";
-import { PaymentTrackingSection } from "../components/PaymentTrackingSection";
-import { NotificationsSection } from "../components/NotificationsSection";
+import { ProcurementTimeline } from "../components/farmerPortal/ProcurementTimeline";
+import { PaymentTrackingSection } from "../components/farmerPortal/PaymentTrackingSection";
+import { NotificationsSection } from "../components/farmerPortal/NotificationsSection";
 import { TrustSection } from "../components/TrustSection";
 import { FaqSection } from "../components/FaqSection";
 import { FinalCta } from "../components/FinalCta";
 
-import { MandiPassModal } from "../components/MandiPassModal";
-import BookSlotModal from "../components/BookSlotModal";
+import { MandiPassModal } from "../components/farmerPortal/MandiPassModal";
+import BookSlotModal from "../components/farmerPortal/BookSlotModal";
 
 export const HomePage: React.FC = () => {
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);

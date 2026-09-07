@@ -240,7 +240,7 @@ export const Hero: React.FC = () => {
       id="hero-section"
       className="
         relative overflow-hidden
-        bg-gradient-to-b from-white via-slate-50 to-emerald-50/30
+        bg-linear-to-r from-white via-slate-50 to-emerald-50/30
         border-b border-slate-200
       "
     >
@@ -252,7 +252,7 @@ export const Hero: React.FC = () => {
         <div
           className="
             absolute -top-32 -right-32
-            h-[420px] w-[420px]
+            h-105 w-105
             rounded-full
             bg-emerald-200/30
             blur-3xl
@@ -262,7 +262,7 @@ export const Hero: React.FC = () => {
         <div
           className="
             absolute top-1/2 -left-40
-            h-[360px] w-[360px]
+            h-90 w-90
             rounded-full
             bg-lime-100/30
             blur-3xl
@@ -272,7 +272,7 @@ export const Hero: React.FC = () => {
         <div
           className="
             absolute inset-x-0 top-0 h-px
-            bg-gradient-to-r
+            bg-linear-to-r
             from-transparent via-emerald-300/50 to-transparent
           "
         />
@@ -357,7 +357,7 @@ export const Hero: React.FC = () => {
               <span
                 className="
                   block
-                  bg-gradient-to-r
+                  bg-linear-to-r
                   from-emerald-700
                   via-emerald-600
                   to-green-500
@@ -568,7 +568,7 @@ export const Hero: React.FC = () => {
                   shadow-slate-900/10
                 "
               >
-                <div className="aspect-[4/3] sm:aspect-[16/11]">
+                <div className="aspect-4/3 sm:aspect-16/11">
                   <img
                     src={heroFarmerImg}
                     alt="Farmer using KishanSetu procurement services"
@@ -587,7 +587,7 @@ export const Hero: React.FC = () => {
                   className="
                     pointer-events-none
                     absolute inset-0
-                    bg-gradient-to-t
+                    bg-linear-to-r
                     from-slate-950/70
                     via-slate-950/10
                     to-transparent
@@ -667,7 +667,7 @@ export const Hero: React.FC = () => {
                   -bottom-8
                   left-3
                   w-[calc(100%-1.5rem)]
-                  max-w-[310px]
+                  max-w-77.5
                   rounded-2xl
                   border border-slate-200
                   bg-white
@@ -675,7 +675,7 @@ export const Hero: React.FC = () => {
                   shadow-xl
                   shadow-slate-900/10
                   sm:-left-7
-                  sm:max-w-[330px]
+                  sm:max-w-82.5
                 "
               >
 
@@ -756,7 +756,7 @@ export const Hero: React.FC = () => {
                         <div className="mt-1 flex items-center justify-end gap-1.5">
                           <Wheat className="h-3.5 w-3.5 text-emerald-600" />
 
-                          <span className="max-w-[120px] truncate text-sm font-bold text-slate-800">
+                          <span className="max-w-30 truncate text-sm font-bold text-slate-800">
                             {cropName}
                           </span>
                         </div>
@@ -921,7 +921,7 @@ export const Hero: React.FC = () => {
                   absolute
                   -right-2
                   -top-5
-                  max-w-[230px]
+                  max-w-57.5
                   rounded-2xl
                   border border-white/70
                   bg-white/95
@@ -972,7 +972,7 @@ export const Hero: React.FC = () => {
                       </span>
                     </div>
 
-                    <p className="mt-0.5 max-w-[150px] truncate text-xs font-bold text-slate-800">
+                    <p className="mt-0.5 max-w-37.5 truncate text-xs font-bold text-slate-800">
                       {centerName}
                     </p>
                   </div>

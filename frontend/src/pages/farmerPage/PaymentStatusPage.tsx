@@ -27,8 +27,8 @@ import {
   CircleDollarSign,
 } from "lucide-react";
 
-import { useAuth } from "../context/AuthContext";
-import { CropType, PaymentTransaction } from "../types";
+import { useAuth } from "../../context/AuthContext";
+import { CropType, PaymentTransaction } from "../../types";
 
 export const PaymentStatusPage: React.FC = () => {
   const { payments, queueTokens, user } = useAuth();
@@ -309,7 +309,7 @@ export const PaymentStatusPage: React.FC = () => {
     );
 
     return (
-      <section className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white py-10 sm:py-14">
+      <section className="min-h-screen bg-linear-to-b from-white via-slate-50 to-white py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* HEADER */}
@@ -848,7 +848,7 @@ export const PaymentStatusPage: React.FC = () => {
 
   if (!activePayment && !latestToken) {
     return (
-      <section className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white py-16">
+      <section className="min-h-screen bg-linear-to-b from-white via-slate-50 to-white py-16">
 
         <div className="max-w-5xl mx-auto px-4 text-center">
 
@@ -884,7 +884,7 @@ export const PaymentStatusPage: React.FC = () => {
   // =========================================================
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-white via-slate-50/70 to-white py-10 sm:py-14 lg:py-16">
+    <section className="min-h-screen bg-linear-to-b from-white via-slate-50 to-white py-10 sm:py-14 lg:py-16">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -2032,7 +2032,7 @@ export const PaymentStatusPage: React.FC = () => {
                             {payment.grossWeightQuintals} Qtl
                           </span>
 
-                          <span className="text-[11px] font-mono text-slate-400 truncate max-w-[180px]">
+                          <span className="text-[11px] font-mono text-slate-400 truncate max-w-45">
                             {payment.transactionId}
                           </span>
 
