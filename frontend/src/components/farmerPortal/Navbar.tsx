@@ -17,9 +17,9 @@ import {
   Wheat,
 } from 'lucide-react';
 
-import { useAuth } from '../context/AuthContext';
-import { LanguageCode } from '../types';
-
+import { useAuth } from '../../context/AuthContext';
+import { LanguageCode } from '../../types';
+// import NotificationBar from '././NotificationBar';
 export const Navbar: React.FC = () => {
   const {
     user,

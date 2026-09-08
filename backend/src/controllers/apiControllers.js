@@ -109,32 +109,105 @@ export const getFarmerProfile = async (req, res) => {
 // Queue & Token Booking Controller
 export const bookToken = async (req, res) => {
   try {
-    const { centerId, crop, date, timeWindow, quantityQuintals } = req.body;
-    
-    const tokenNumber = Math.floor(25 + Math.random() * 50);
-    const tokenCode = `HAR-${String(tokenNumber).padStart(3, '0')}`;
+    const {
+      centerId,
+      crop,
+      date,
+      timeWindow,
+      quantityQuintals,
+      farmerId,
+      farmerName,
+      farmerPhone,
+      village
+    } = req.body;
 
-    await logAudit(req.body.farmerName || 'Ramesh Patel', 'farmer', 'TOKEN_BOOKED', tokenCode, `Booked ${quantityQuintals} Qtl ${crop} at center ${centerId}`);
+    if (
+      !centerId ||
+      !crop ||
+      !date ||
+      !timeWindow ||
+      !quantityQuintals ||
+      !farmerId ||
+      !farmerName ||
+      !farmerPhone
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'centerId, crop, date, timeWindow, quantityQuintals, farmerId, farmerName and farmerPhone are required'
+      });
+    }
 
-    return res.json({
-      success: true,
-      token: {
-        tokenNumber,
-        tokenCode,
-        farmerId: 'USR-8821',
-        farmerName: 'Ramesh Kumar Patel',
-        farmerPhone: '+91 98321 44821',
-        village: 'Haripur Paschim',
-        crop: crop || 'Rice / Paddy',
-        quantityQuintals: quantityQuintals || 45,
-        slotTime: timeWindow || '09:00 AM - 12:00 PM',
-        status: 'waiting',
-        estimatedWaitMinutes: 36,
-        arrivedAt: null
+    const existingToken = await Token.findOne({
+      farmerId,
+      date,
+      status: {
+        $in: [
+          'waiting',
+          'next',
+          'arrived',
+          'processing'
+        ]
       }
     });
+
+    if (existingToken) {
+      return res.status(409).json({
+        success: false,
+        message: 'Farmer already has an active token for this date',
+        token: existingToken
+      });
+    }
+
+    const latestToken = await Token.findOne({
+      centerId,
+      date
+    }).sort({
+      tokenNumber: -1
+    });
+
+    const tokenNumber = latestToken
+      ? latestToken.tokenNumber + 1
+      : 1;
+
+    const tokenCode =
+      `${centerId}-${date.replaceAll('-', '')}-${String(tokenNumber).padStart(3, '0')}`;
+
+    const token = await Token.create({
+      tokenNumber,
+      tokenCode,
+      centerId,
+      farmerId,
+      farmerName,
+      farmerPhone,
+      village,
+      crop,
+      quantityQuintals,
+      date,
+      slotTime: timeWindow,
+      status: 'waiting',
+      estimatedWaitMinutes: 30
+    });
+
+    await logAudit(
+      farmerId,
+      'farmer',
+      'TOKEN_BOOKED',
+      tokenCode,
+      `Booked ${quantityQuintals} Qtl ${crop} at center ${centerId}`
+    );
+
+    return res.status(201).json({
+      success: true,
+      token
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error('[Book Token Error]', error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 

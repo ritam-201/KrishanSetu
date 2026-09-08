@@ -1,34 +1,52 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { AdminAuthProvider } from './context/AdminContext';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
-// Pages
-import { HomePage } from './pages/HomePage';
-import  FarmerDashboard  from './pages/farmerPage/FarmerDashboard';
-import { FarmerProfilePage } from './pages/farmerPage/FarmerProfilePage';
-import { ProcurementSchedulePage } from './pages/farmerPage/ProcurementSchedulePage';
-import { QueueTrackingPage } from './pages/farmerPage/QueueTrackingPage';
-import { ProcurementStatusPage } from './pages/farmerPage/ProcurementStatusPage';
-import { PaymentStatusPage } from './pages/farmerPage/PaymentStatusPage';
-import  NotificationsPage  from './pages/farmerPage/NotificationsPage';
-import { OfficerDashboard } from './pages/adminPage/OfficerDashboard';
-import { AdminDashboard } from './pages/adminPage/AdminDashboard';
-import { AdminLoginPage } from './pages/adminPage/AdminLoginPage';
-import { AdminProfilePage } from './pages/adminPage/AdminProfilePage';
-import { AdminManagementPage } from './pages/adminPage/AdminManagementPage';
-import { LoginPage } from './pages/LoginPage';
-import  RegisterPage  from './pages/farmerPage/RegisterPage';
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AdminAuthProvider } from "./context/AdminContext";
 
-// Components
-import { AiAssistant } from './components/farmerPortal/AiAssistant';
-import { OfflineBanner } from './components/OfflineBanner';
-import { AdminProtectedRoute } from './components/adminPortal/AdminProtectedRoute';
-import { Weather } from './components/Weather';
+import { Navbar } from "./components/farmerPortal/Navbar";
+import { Footer } from "./components/Footer";
+import { AiAssistant } from "./components/farmerPortal/AiAssistant";
+import { OfflineBanner } from "./components/OfflineBanner";
+import { AdminProtectedRoute } from "./components/adminPortal/AdminProtectedRoute";
+import { Weather } from "./components/Weather";
+import AdminLayout from "./components/adminPortal/AdminLayout";
 
-// Scroll to top helper on navigation
+// Farmer/Public Pages
+import { HomePage } from "./pages/HomePage";
+import FarmerDashboard from "./pages/farmerPage/FarmerDashboard";
+import { FarmerProfilePage } from "./pages/farmerPage/FarmerProfilePage";
+import { ProcurementSchedulePage } from "./pages/farmerPage/ProcurementSchedulePage";
+import { QueueTrackingPage } from "./pages/farmerPage/QueueTrackingPage";
+import { ProcurementStatusPage } from "./pages/farmerPage/ProcurementStatusPage";
+import { PaymentStatusPage } from "./pages/farmerPage/PaymentStatusPage";
+import NotificationsPage from "./pages/farmerPage/NotificationsPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/farmerPage/RegisterPage";
+
+// Officer
+import { OfficerDashboard } from "./pages/adminPage/OfficerDashboard";
+
+// Admin Pages
+import { AdminDashboard } from "./pages/adminPage/AdminDashboard";
+import { AdminLoginPage } from "./pages/adminPage/AdminLoginPage";
+import AdminRegisterPage from "./pages/adminPage/AdminRegisterPage";
+import { AdminProfilePage } from "./pages/adminPage/AdminProfilePage";
+import { AdminManagementPage } from "./pages/adminPage/AdminManagementPage";
+
+import Payments from "./pages/adminPage/Payments";
+import CropBookings from "./pages/adminPage/CropBookings";
+import QueueTokens from "./pages/adminPage/QueueTokens";
+import Reports from "./pages/adminPage/Reports";
+import Farmers from "./pages/adminPage/Farmers";
+
+// Scroll to top
 const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
 
@@ -39,7 +57,23 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
-const FarmerProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Show Farmer Navbar only on non-admin routes
+const ConditionalNavbar: React.FC = () => {
+  const { pathname } = useLocation();
+
+  const isAdminRoute = pathname.startsWith("/admin");
+
+  if (isAdminRoute) {
+    return null;
+  }
+
+  return <Navbar />;
+};
+
+// Farmer Protected Route
+const FarmerProtectedRoute: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
@@ -54,16 +88,49 @@ export const App: React.FC = () => {
     <AuthProvider>
       <AdminAuthProvider>
         <BrowserRouter>
-          <ScrollToTop />
-          <OfflineBanner />
-          <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
-            {/* Top Sticky Navigation */}
-            <Navbar />
 
-            {/* Main Content Area */}
+          <ScrollToTop />
+
+          <OfflineBanner />
+
+          <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
+
+            {/* Farmer/Public Navbar */}
+            <ConditionalNavbar />
+
+            {/* Main Content */}
             <main className="flex-1">
+
               <Routes>
-                <Route path="/" element={<HomePage />} />
+
+                {/* ========================= */}
+                {/* PUBLIC ROUTES */}
+                {/* ========================= */}
+
+                <Route
+                  path="/"
+                  element={<HomePage />}
+                />
+
+                <Route
+                  path="/login"
+                  element={<LoginPage />}
+                />
+
+                <Route
+                  path="/register"
+                  element={<RegisterPage />}
+                />
+
+                <Route
+                  path="/weather"
+                  element={<Weather />}
+                />
+
+                {/* ========================= */}
+                {/* FARMER ROUTES */}
+                {/* ========================= */}
+
                 <Route
                   path="/dashboard"
                   element={
@@ -72,6 +139,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/profile"
                   element={
@@ -80,6 +148,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/schedule"
                   element={
@@ -88,6 +157,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/queue"
                   element={
@@ -96,6 +166,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/centers"
                   element={
@@ -104,6 +175,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/status"
                   element={
@@ -112,11 +184,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
-                {/* Weather */}
-                <Route
-                  path="/weather"
-                  element={<Weather />}
-                />
+
                 <Route
                   path="/payments"
                   element={
@@ -125,6 +193,7 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/notifications"
                   element={
@@ -133,6 +202,11 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
+
+                {/* ========================= */}
+                {/* OFFICER ROUTE */}
+                {/* ========================= */}
+
                 <Route
                   path="/officer"
                   element={
@@ -141,53 +215,164 @@ export const App: React.FC = () => {
                     </FarmerProtectedRoute>
                   }
                 />
-                
-                {/* Dedicated Admin System Routes */}
-                <Route path="/admin/login" element={<AdminLoginPage />} />
+
+                {/* ========================= */}
+                {/* ADMIN AUTH ROUTES */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/login"
+                  element={<AdminLoginPage />}
+                />
+
+                <Route
+                  path="/admin/register"
+                  element={<AdminRegisterPage />}
+                />
+
+                {/* ========================= */}
+                {/* ADMIN DASHBOARD */}
+                {/* ========================= */}
+
                 <Route
                   path="/admin"
                   element={
                     <AdminProtectedRoute>
-                      <AdminDashboard />
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
                     </AdminProtectedRoute>
                   }
                 />
+
                 <Route
                   path="/admin/dashboard"
                   element={
                     <AdminProtectedRoute>
-                      <AdminDashboard />
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
                     </AdminProtectedRoute>
                   }
                 />
+
+                {/* ========================= */}
+                {/* ADMIN PROFILE */}
+                {/* ========================= */}
+
                 <Route
                   path="/admin/profile"
                   element={
                     <AdminProtectedRoute>
-                      <AdminProfilePage />
+                      <AdminLayout>
+                        <AdminProfilePage />
+                      </AdminLayout>
                     </AdminProtectedRoute>
                   }
                 />
+
+                {/* ========================= */}
+                {/* ADMIN MANAGEMENT */}
+                {/* ========================= */}
+
                 <Route
                   path="/admin/admins"
                   element={
                     <AdminProtectedRoute requiredRole="SUPER_ADMIN">
-                      <AdminManagementPage />
+                      <AdminLayout>
+                        <AdminManagementPage />
+                      </AdminLayout>
                     </AdminProtectedRoute>
                   }
                 />
 
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+                {/* ========================= */}
+                {/* ADMIN CROP BOOKINGS */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/crop-bookings"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout>
+                        <CropBookings />
+                      </AdminLayout>
+                    </AdminProtectedRoute>
+                  }
+                />
+
+                {/* ========================= */}
+                {/* ADMIN PAYMENTS */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/payments"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout>
+                        <Payments />
+                      </AdminLayout>
+                    </AdminProtectedRoute>
+                  }
+                />
+
+                {/* ========================= */}
+                {/* ADMIN FARMERS */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/farmers"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout>
+                        <Farmers />
+                      </AdminLayout>
+                    </AdminProtectedRoute>
+                  }
+                />
+
+                {/* ========================= */}
+                {/* ADMIN QUEUE */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/queue"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout>
+                        <QueueTokens />
+                      </AdminLayout>
+                    </AdminProtectedRoute>
+                  }
+                />
+
+                {/* ========================= */}
+                {/* ADMIN REPORTS */}
+                {/* ========================= */}
+
+                <Route
+                  path="/admin/reports"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout>
+                        <Reports />
+                      </AdminLayout>
+                    </AdminProtectedRoute>
+                  }
+                />
+
               </Routes>
+
             </main>
 
-            {/* Floating Voice-Enabled AI Farmer Assistant */}
+            {/* Farmer AI Assistant */}
             <AiAssistant />
 
-            {/* Persistent Footer */}
+            {/* Footer */}
             <Footer />
+
           </div>
+
         </BrowserRouter>
       </AdminAuthProvider>
     </AuthProvider>

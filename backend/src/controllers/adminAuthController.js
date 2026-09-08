@@ -130,7 +130,117 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-// 2. Logout Admin Controller
+// 2.a. Admin Registration Controller
+export const registerAdmin = async (req, res) => {
+  try {
+    const {
+      fullName,
+      email,
+      password,
+      confirmPassword
+    } = req.body;
+
+    // Basic validation
+    if (!fullName || !email || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name, email, password and confirm password are required.'
+      });
+    }
+
+    const cleanName = fullName.trim();
+    const cleanEmail = email.toLowerCase().trim();
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain at least 8 characters.'
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match.'
+      });
+    }
+
+    // Check if email already exists
+    const existingAdmin = await Admin.findOne({
+      email: cleanEmail
+    });
+
+    if (existingAdmin) {
+      return res.status(409).json({
+        success: false,
+        message: 'An administrator with this email already exists.'
+      });
+    }
+
+    // Generate unique Admin ID
+    const adminId = `ADM-${new Date().getFullYear()}-${Date.now()
+      .toString()
+      .slice(-6)}`;
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // Create new admin
+    const admin = await Admin.create({
+      adminId,
+      fullName: cleanName,
+      email: cleanEmail,
+      phone: 'Not provided',
+      passwordHash,
+      role: 'ADMIN',
+      department: 'State Agricultural Marketing Board',
+      designation: 'Administrator',
+      accountStatus: 'active',
+      failedLoginAttempts: 0,
+      lockUntil: null,
+      twoFactorEnabled: false
+    });
+
+    // Audit registration
+    await logAdminAudit(
+      admin.fullName,
+      admin.role,
+      'ADMIN_REGISTERED',
+      admin.adminId,
+      'New administrator account created successfully'
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: 'Admin account created successfully.',
+      admin: {
+        adminId: admin.adminId,
+        fullName: admin.fullName,
+        email: admin.email,
+        role: admin.role
+      }
+    });
+
+  } catch (error) {
+    console.error('[Admin Registration Error]:', error);
+
+    // Handle MongoDB duplicate key errors
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: 'An administrator with this email already exists.'
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to create administrator account.'
+    });
+  }
+};
+
+// 2.b. Logout Admin Controller
 export const logoutAdmin = async (req, res) => {
   try {
     const adminId = req.user?.adminId || 'ADM-001';
