@@ -380,7 +380,7 @@ export const AiAssistant: React.FC = () => {
         <Bot className="w-6 h-6 animate-pulse" />
 
         <span className="text-sm font-bold tracking-wide pr-1">
-          Kisan AI
+          Kisan Bandhu
         </span>
 
         <span className="flex h-2.5 w-2.5 relative">

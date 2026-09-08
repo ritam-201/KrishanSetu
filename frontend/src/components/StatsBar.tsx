@@ -41,7 +41,9 @@ export const StatsBar: React.FC = () => {
   ];
 
   return (
-    <section id="trust-statistics-bar" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 mb-12 relative z-20">
+    <section
+  id="trust-statistics-bar"
+  className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 mb-12 relative z-20">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {metrics.map((item, idx) => {
           const Icon = item.icon;

@@ -26,6 +26,7 @@ import  RegisterPage  from './pages/farmerPage/RegisterPage';
 import { AiAssistant } from './components/farmerPortal/AiAssistant';
 import { OfflineBanner } from './components/farmerPortal/OfflineBanner';
 import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import { Weather } from './components/Weather';
 
 // Scroll to top helper on navigation
 const ScrollToTop: React.FC = () => {
@@ -110,6 +111,11 @@ export const App: React.FC = () => {
                       <ProcurementStatusPage />
                     </FarmerProtectedRoute>
                   }
+                />
+                {/* Weather */}
+                <Route
+                  path="/weather"
+                  element={<Weather />}
                 />
                 <Route
                   path="/payments"
