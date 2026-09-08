@@ -18,12 +18,19 @@ import { FinalCta } from "../components/FinalCta";
 import { MandiPassModal } from "../components/farmerPortal/MandiPassModal";
 import BookSlotModal from "../components/farmerPortal/BookSlotModal";
 
+import { WeatherAlert } from "../components/WeatherAlert";
+
 export const HomePage: React.FC = () => {
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-slate-50">
+
+      {/* =====================================================
+          WEATHER ALERT
+      ===================================================== */}
+      <WeatherAlert />
 
       {/* =====================================================
           PERSONALIZED FARMER HERO
@@ -40,9 +47,7 @@ export const HomePage: React.FC = () => {
 
       {/* =====================================================
           INFORMATIONAL SECTIONS
-          These can remain public/general content.
       ===================================================== */}
-
       <ProblemSolution />
 
       <SmartSolutions />
@@ -56,7 +61,6 @@ export const HomePage: React.FC = () => {
       {/* =====================================================
           PERSONALIZED FARMER DATA
       ===================================================== */}
-
       <DashboardPreview />
 
       <ProcurementTimeline />
@@ -68,7 +72,6 @@ export const HomePage: React.FC = () => {
       {/* =====================================================
           TRUST / FAQ / CTA
       ===================================================== */}
-
       <TrustSection />
 
       <FaqSection />
@@ -80,7 +83,6 @@ export const HomePage: React.FC = () => {
       {/* =====================================================
           MODALS
       ===================================================== */}
-
       <MandiPassModal
         isOpen={isPassModalOpen}
         onClose={() => setIsPassModalOpen(false)}

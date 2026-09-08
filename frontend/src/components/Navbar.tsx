@@ -6,8 +6,6 @@ import {
   X,
   Bell,
   Globe,
-  UserCheck,
-  ChevronDown,
   CheckCircle2,
   LogOut,
   Sparkles,
@@ -15,12 +13,13 @@ import {
   Building2,
   Crown,
   ChevronRight,
+  ChevronDown,
   Wheat,
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 import { LanguageCode } from '../types';
-import NotificationBar from './NotificationBar';
+
 export const Navbar: React.FC = () => {
   const {
     user,
@@ -50,6 +49,7 @@ export const Navbar: React.FC = () => {
 
   const handleLogin = () => {
     setMobileMenuOpen(false);
+    setRoleDropdownOpen(false);
     navigate('/login');
   };
 
@@ -168,7 +168,6 @@ export const Navbar: React.FC = () => {
           : role === 'officer'
             ? '/officer'
             : '/admin',
-      
     },
   ];
 
@@ -220,11 +219,11 @@ export const Navbar: React.FC = () => {
       >
         <div className="w-full">
           <div
-            className={`
+            className="
               flex h-19 items-center
               pl-3 pr-4 sm:pl-4 sm:pr-6 lg:pl-5 lg:pr-8
               transition-all duration-300
-            `}
+            "
           >
             {/* =================================================
                 LOGO
@@ -235,7 +234,6 @@ export const Navbar: React.FC = () => {
               className="group flex shrink-0 items-center gap-3"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {/* Logo */}
               <div
                 className="
                   relative flex h-11 w-11
@@ -253,7 +251,6 @@ export const Navbar: React.FC = () => {
                 <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
 
-              {/* Brand */}
               <div className="hidden sm:block">
                 <div className="flex items-center gap-1">
                   <span className="text-[18px] font-black tracking-[-0.04em] text-slate-900">
@@ -339,6 +336,7 @@ export const Navbar: React.FC = () => {
             ================================================== */}
 
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+
               {/* =================================================
                   ROLE / ACCOUNT DROPDOWN
               ================================================== */}
@@ -363,7 +361,6 @@ export const Navbar: React.FC = () => {
                       hover:shadow-sm
                     "
                   >
-                    {/* Avatar */}
                     <div
                       className="
                         flex h-9 w-9 items-center justify-center
@@ -383,6 +380,7 @@ export const Navbar: React.FC = () => {
                         {user?.name || 'User'}
                       </p>
 
+                      {/* Current logged-in role */}
                       <p className="text-[10px] font-medium text-slate-400">
                         {roleLabel}
                       </p>
@@ -406,17 +404,18 @@ export const Navbar: React.FC = () => {
                   ================================================== */}
 
                   {roleDropdownOpen && (
-                    <div
-                      className="
-                        absolute right-0 top-[calc(100%+12px)]
-                        w-82.5
-                        overflow-hidden
-                        rounded-3xl
-                        border border-slate-200
-                        bg-white
-                        shadow-[0_20px_60px_rgba(15,23,42,0.14)]
-                      "
-                    >
+                 <div className="
+    absolute right-0 top-[calc(100%+12px)]
+    w-82.5
+    max-h-[calc(100vh-90px)]
+    overflow-y-auto
+    overflow-x-hidden
+    rounded-3xl
+    border border-slate-200
+    bg-white
+    shadow-[0_20px_60px_rgba(15,23,42,0.14)]
+  "
+>
                       {/* Profile Header */}
 
                       <div className="bg-linear-to-br from-slate-50 to-white p-5">
@@ -488,16 +487,20 @@ export const Navbar: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Divider */}
-
                       <div className="border-t border-slate-100" />
 
-                      {/* Role Switcher */}
+                      {/* =================================================
+                          ROLE SWITCHER
+                      ================================================== */}
 
                       <div className="p-3">
                         <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
                           Switch Role
                         </p>
+
+                        {/* =================================================
+                            FARMER
+                        ================================================== */}
 
                         <button
                           onClick={() => {
@@ -547,35 +550,35 @@ export const Navbar: React.FC = () => {
                           )}
                         </button>
 
+                        {/* =================================================
+                            MANDI OFFICER
+                            IMPORTANT:
+                            Farmer click করলে LOGIN PAGE আসবে.
+                            Farmer role change হবে না.
+                        ================================================== */}
+
                         <button
                           onClick={() => {
-                            switchRole('officer');
                             setRoleDropdownOpen(false);
-                            navigate('/officer');
+                            navigate('/login');
                           }}
-                          className={`
+                          className="
                             mt-1 flex w-full items-center gap-3
                             rounded-2xl
                             px-3 py-3
                             text-left
+                            text-slate-600
                             transition-all
-                            ${
-                              role === 'officer'
-                                ? 'bg-blue-50 text-blue-700'
-                                : 'text-slate-600 hover:bg-slate-50'
-                            }
-                          `}
+                            hover:bg-blue-50
+                            hover:text-blue-700
+                          "
                         >
                           <div
-                            className={`
+                            className="
                               flex h-9 w-9 items-center justify-center
                               rounded-xl
-                              ${
-                                role === 'officer'
-                                  ? 'bg-blue-100'
-                                  : 'bg-slate-100'
-                              }
-                            `}
+                              bg-slate-100
+                            "
                           >
                             <Building2 className="h-4 w-4" />
                           </div>
@@ -586,44 +589,42 @@ export const Navbar: React.FC = () => {
                             </p>
 
                             <p className="text-[10px] text-slate-400">
-                              Manage procurement
+                              Login required for officer access
                             </p>
                           </div>
 
-                          {role === 'officer' && (
-                            <CheckCircle2 className="h-4 w-4 text-blue-500" />
-                          )}
+                          <ChevronRight className="h-4 w-4 text-slate-300" />
                         </button>
+
+                        {/* =================================================
+                            ADMIN
+                            IMPORTANT:
+                            Farmer click করলে LOGIN PAGE আসবে.
+                            Farmer role change হবে না.
+                        ================================================== */}
 
                         <button
                           onClick={() => {
-                            switchRole('admin');
                             setRoleDropdownOpen(false);
-                            navigate('/admin');
+                            navigate('/login');
                           }}
-                          className={`
+                          className="
                             mt-1 flex w-full items-center gap-3
                             rounded-2xl
                             px-3 py-3
                             text-left
+                            text-slate-600
                             transition-all
-                            ${
-                              role === 'admin'
-                                ? 'bg-purple-50 text-purple-700'
-                                : 'text-slate-600 hover:bg-slate-50'
-                            }
-                          `}
+                            hover:bg-purple-50
+                            hover:text-purple-700
+                          "
                         >
                           <div
-                            className={`
+                            className="
                               flex h-9 w-9 items-center justify-center
                               rounded-xl
-                              ${
-                                role === 'admin'
-                                  ? 'bg-purple-100'
-                                  : 'bg-slate-100'
-                              }
-                            `}
+                              bg-slate-100
+                            "
                           >
                             <Crown className="h-4 w-4" />
                           </div>
@@ -634,19 +635,22 @@ export const Navbar: React.FC = () => {
                             </p>
 
                             <p className="text-[10px] text-slate-400">
-                              System administration
+                              Login required for admin access
                             </p>
                           </div>
 
-                          {role === 'admin' && (
-                            <CheckCircle2 className="h-4 w-4 text-purple-500" />
-                          )}
+                          <ChevronRight className="h-4 w-4 text-slate-300" />
                         </button>
                       </div>
 
-                      {/* Account Actions */}
+                      {/* =================================================
+                          ACCOUNT ACTIONS
+                      ================================================== */}
 
                       <div className="border-t border-slate-100 p-3">
+
+                        {/* Profile */}
+
                         <Link
                           to="/profile"
                           onClick={() => setRoleDropdownOpen(false)}
@@ -676,6 +680,8 @@ export const Navbar: React.FC = () => {
 
                           <ChevronRight className="h-4 w-4 text-slate-300" />
                         </Link>
+
+                        {/* Register */}
 
                         <Link
                           to="/register"
@@ -1018,11 +1024,9 @@ export const Navbar: React.FC = () => {
                       transition-all
                       hover:-translate-y-0.5
                       hover:bg-slate-800
-                      hover:shadow-[0_8px_22px_rgba(15,23,42,0.2)]
                     "
                   >
                     <Sprout className="h-3.5 w-3.5 text-emerald-400" />
-
                     Get Started
                   </Link>
                 </>
@@ -1044,7 +1048,6 @@ export const Navbar: React.FC = () => {
                   "
                 >
                   <LogOut className="h-3.5 w-3.5" />
-
                   Logout
                 </button>
               )}
@@ -1084,7 +1087,10 @@ export const Navbar: React.FC = () => {
           {mobileMenuOpen && (
             <div className="border-t border-slate-100 bg-white lg:hidden">
               <div className="max-h-[calc(100vh-76px)] overflow-y-auto px-4 py-4">
-                {/* Mobile User */}
+
+                {/* =================================================
+                    MOBILE USER
+                ================================================== */}
 
                 {isAuthenticated && (
                   <div
@@ -1114,6 +1120,7 @@ export const Navbar: React.FC = () => {
                           {user?.name || 'User'}
                         </p>
 
+                        {/* Current logged-in role */}
                         <p className="mt-0.5 text-[10px] font-medium text-emerald-600">
                           {roleLabel}
                         </p>
@@ -1122,7 +1129,9 @@ export const Navbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* Mobile Navigation */}
+                {/* =================================================
+                    MOBILE NAVIGATION
+                ================================================== */}
 
                 <nav className="space-y-1">
                   {navLinks.map((link) => {
@@ -1174,7 +1183,9 @@ export const Navbar: React.FC = () => {
                   })}
                 </nav>
 
-                {/* Mobile Account Actions */}
+                {/* =================================================
+                    MOBILE ACCOUNT ACTIONS
+                ================================================== */}
 
                 {isAuthenticated && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
@@ -1195,7 +1206,6 @@ export const Navbar: React.FC = () => {
                       "
                     >
                       <User className="h-4 w-4" />
-
                       Profile
                     </Link>
 
@@ -1212,13 +1222,14 @@ export const Navbar: React.FC = () => {
                       "
                     >
                       <Wheat className="h-4 w-4" />
-
                       Register Farm & Crop Details
                     </Link>
                   </div>
                 )}
 
-                {/* Mobile Role Switcher */}
+                {/* =================================================
+                    MOBILE ROLE SWITCHER
+                ================================================== */}
 
                 {isAuthenticated && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
@@ -1227,6 +1238,11 @@ export const Navbar: React.FC = () => {
                     </p>
 
                     <div className="grid grid-cols-3 gap-2">
+
+                      {/* =================================================
+                          FARMER
+                      ================================================== */}
+
                       <button
                         onClick={() => {
                           switchRole('farmer');
@@ -1253,24 +1269,30 @@ export const Navbar: React.FC = () => {
                         </span>
                       </button>
 
+                      {/* =================================================
+                          MANDI OFFICER
+                          LOGIN PAGE ONLY
+                      ================================================== */}
+
                       <button
                         onClick={() => {
-                          switchRole('officer');
                           setMobileMenuOpen(false);
-                          navigate('/officer');
+                          navigate('/login');
                         }}
-                        className={`
+                        className="
                           flex flex-col items-center gap-2
                           rounded-2xl
                           border
+                          border-slate-200
+                          bg-white
                           px-2 py-3
                           text-center
-                          ${
-                            role === 'officer'
-                              ? 'border-blue-200 bg-blue-50 text-blue-700'
-                              : 'border-slate-200 bg-white text-slate-500'
-                          }
-                        `}
+                          text-slate-500
+                          transition-all
+                          hover:border-blue-200
+                          hover:bg-blue-50
+                          hover:text-blue-700
+                        "
                       >
                         <Building2 className="h-4 w-4" />
 
@@ -1279,24 +1301,30 @@ export const Navbar: React.FC = () => {
                         </span>
                       </button>
 
+                      {/* =================================================
+                          ADMIN
+                          LOGIN PAGE ONLY
+                      ================================================== */}
+
                       <button
                         onClick={() => {
-                          switchRole('admin');
                           setMobileMenuOpen(false);
-                          navigate('/admin');
+                          navigate('/login');
                         }}
-                        className={`
+                        className="
                           flex flex-col items-center gap-2
                           rounded-2xl
                           border
+                          border-slate-200
+                          bg-white
                           px-2 py-3
                           text-center
-                          ${
-                            role === 'admin'
-                              ? 'border-purple-200 bg-purple-50 text-purple-700'
-                              : 'border-slate-200 bg-white text-slate-500'
-                          }
-                        `}
+                          text-slate-500
+                          transition-all
+                          hover:border-purple-200
+                          hover:bg-purple-50
+                          hover:text-purple-700
+                        "
                       >
                         <Crown className="h-4 w-4" />
 
@@ -1308,7 +1336,9 @@ export const Navbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* Mobile Login / Logout */}
+                {/* =================================================
+                    MOBILE LOGIN / LOGOUT
+                ================================================== */}
 
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   {!isAuthenticated ? (
@@ -1365,7 +1395,9 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                {/* Mobile Language */}
+                {/* =================================================
+                    MOBILE LANGUAGE
+                ================================================== */}
 
                 <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4">
                   {(Object.keys(langNames) as LanguageCode[]).map(

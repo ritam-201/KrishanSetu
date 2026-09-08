@@ -3,6 +3,7 @@ import {
   CloudSun,
   CloudRain,
   Sun,
+  Moon,
   Cloud,
   Droplets,
   Wind,
@@ -72,33 +73,110 @@ export function Weather() {
     fetchWeather();
   }, []);
 
-  /* ---------------- WEATHER ICON ---------------- */
+  /* ================================================= */
+  /* DAY / NIGHT DETECTION */
+  /* ================================================= */
 
-  const getWeatherIcon = (code: number, size = 30) => {
-    if (code === 0) {
-      return <Sun size={size} className="text-amber-500" />;
-    }
+  const isNightTime = (
+    time: string,
+    sunrise: string,
+    sunset: string
+  ) => {
+    const checkTime = new Date(time);
+    const sunriseTime = new Date(sunrise);
+    const sunsetTime = new Date(sunset);
 
-    if (code >= 1 && code <= 3) {
-      return <CloudSun size={size} className="text-sky-500" />;
-    }
-
-    if (code >= 51 && code <= 67) {
-      return <CloudRain size={size} className="text-blue-500" />;
-    }
-
-    if (code >= 80 && code <= 82) {
-      return <CloudRain size={size} className="text-blue-600" />;
-    }
-
-    if (code >= 95) {
-      return <CloudRain size={size} className="text-indigo-600" />;
-    }
-
-    return <Cloud size={size} className="text-slate-500" />;
+    return (
+      checkTime < sunriseTime ||
+      checkTime >= sunsetTime
+    );
   };
 
-  /* ---------------- WEATHER TEXT ---------------- */
+  /* ================================================= */
+  /* WEATHER ICON */
+  /* ================================================= */
+
+  const getWeatherIcon = (
+    code: number,
+    size = 30,
+    night = false
+  ) => {
+    /* Clear sky */
+
+    if (code === 0) {
+      return night ? (
+        <Moon
+          size={size}
+          className="text-indigo-300"
+        />
+      ) : (
+        <Sun
+          size={size}
+          className="text-amber-500"
+        />
+      );
+    }
+
+    /* Partly cloudy */
+
+    if (code >= 1 && code <= 3) {
+      return night ? (
+        <Cloud
+          size={size}
+          className="text-slate-300"
+        />
+      ) : (
+        <CloudSun
+          size={size}
+          className="text-sky-500"
+        />
+      );
+    }
+
+    /* Rain */
+
+    if (code >= 51 && code <= 67) {
+      return (
+        <CloudRain
+          size={size}
+          className="text-blue-500"
+        />
+      );
+    }
+
+    /* Rain showers */
+
+    if (code >= 80 && code <= 82) {
+      return (
+        <CloudRain
+          size={size}
+          className="text-blue-600"
+        />
+      );
+    }
+
+    /* Thunderstorm */
+
+    if (code >= 95) {
+      return (
+        <CloudRain
+          size={size}
+          className="text-indigo-600"
+        />
+      );
+    }
+
+    return (
+      <Cloud
+        size={size}
+        className="text-slate-500"
+      />
+    );
+  };
+
+  /* ================================================= */
+  /* WEATHER TEXT */
+  /* ================================================= */
 
   const getWeatherText = (code: number) => {
     if (code === 0) return "Clear Sky";
@@ -122,7 +200,9 @@ export function Weather() {
     return "Cloudy";
   };
 
-  /* ---------------- LOADING ---------------- */
+  /* ================================================= */
+  /* LOADING */
+  /* ================================================= */
 
   if (loading) {
     return (
@@ -142,7 +222,9 @@ export function Weather() {
     );
   }
 
-  /* ---------------- ERROR ---------------- */
+  /* ================================================= */
+  /* ERROR */
+  /* ================================================= */
 
   if (!weather) {
     return (
@@ -180,13 +262,35 @@ export function Weather() {
   const tomorrowRain =
     daily.precipitation_probability_max[1] ?? 0;
 
-  const maxTemperature =
-    Math.round(daily.temperature_2m_max[0]);
+  const maxTemperature = Math.round(
+    daily.temperature_2m_max[0]
+  );
 
-  const minTemperature =
-    Math.round(daily.temperature_2m_min[0]);
+  const minTemperature = Math.round(
+    daily.temperature_2m_min[0]
+  );
 
-  /* Next 8 hours */
+  /* ================================================= */
+  /* CURRENT DAY / NIGHT */
+  /* ================================================= */
+
+  const now = new Date();
+
+  const todaySunrise = new Date(
+    daily.sunrise[0]
+  );
+
+  const todaySunset = new Date(
+    daily.sunset[0]
+  );
+
+  const isCurrentlyNight =
+    now < todaySunrise ||
+    now >= todaySunset;
+
+  /* ================================================= */
+  /* NEXT 8 HOURS */
+  /* ================================================= */
 
   const currentHourIndex = Math.max(
     0,
@@ -196,18 +300,27 @@ export function Weather() {
   );
 
   const nextHours = hourly.time
-    .slice(currentHourIndex, currentHourIndex + 8)
+    .slice(
+      currentHourIndex,
+      currentHourIndex + 8
+    )
     .map((time, index) => ({
       time,
+
       temperature:
-        hourly.temperature_2m[currentHourIndex + index],
+        hourly.temperature_2m[
+          currentHourIndex + index
+        ],
+
       rain:
         hourly.precipitation_probability[
           currentHourIndex + index
         ],
     }));
 
-  /* ---------------- PAGE ---------------- */
+  /* ================================================= */
+  /* PAGE */
+  /* ================================================= */
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -224,12 +337,13 @@ export function Weather() {
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-12 md:py-16">
 
-          {/* Top Row */}
+          {/* TOP ROW */}
 
           <div className="flex items-center justify-between">
 
             <div className="flex items-center gap-2 text-green-100 text-sm">
               <Sprout size={18} />
+
               Kisan Setu Weather Intelligence
             </div>
 
@@ -238,13 +352,13 @@ export function Weather() {
               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20 transition text-sm"
             >
               <RefreshCw size={16} />
+
               Refresh
             </button>
 
           </div>
 
-
-          {/* Hero Content */}
+          {/* HERO CONTENT */}
 
           <div className="grid lg:grid-cols-2 gap-10 items-center mt-10">
 
@@ -252,11 +366,15 @@ export function Weather() {
 
               <div className="flex items-center gap-2 text-green-100 mb-4">
                 <MapPin size={17} />
-                <span>Kolkata, West Bengal</span>
+
+                <span>
+                  Kolkata, West Bengal
+                </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
                 Weather that
+
                 <span className="block text-emerald-200">
                   helps you farm smarter.
                 </span>
@@ -269,8 +387,7 @@ export function Weather() {
 
             </div>
 
-
-            {/* Main Temperature */}
+            {/* MAIN TEMPERATURE */}
 
             <div className="lg:justify-self-end">
 
@@ -279,6 +396,7 @@ export function Weather() {
                 <div className="flex items-center justify-between">
 
                   <div>
+
                     <p className="text-sm text-green-100">
                       Current Weather
                     </p>
@@ -286,7 +404,9 @@ export function Weather() {
                     <div className="flex items-start mt-2">
 
                       <span className="text-7xl font-bold">
-                        {Math.round(current.temperature_2m)}
+                        {Math.round(
+                          current.temperature_2m
+                        )}
                       </span>
 
                       <span className="text-2xl font-semibold mt-2">
@@ -294,23 +414,30 @@ export function Weather() {
                       </span>
 
                     </div>
+
                   </div>
 
                   <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center">
+
                     {getWeatherIcon(
                       current.weather_code,
-                      48
+                      48,
+                      isCurrentlyNight
                     )}
+
                   </div>
 
                 </div>
 
                 <p className="text-lg font-semibold mt-4">
-                  {getWeatherText(current.weather_code)}
+                  {getWeatherText(
+                    current.weather_code
+                  )}
                 </p>
 
                 <p className="text-sm text-green-100 mt-1">
-                  High {maxTemperature}° · Low {minTemperature}°
+                  High {maxTemperature}° · Low{" "}
+                  {minTemperature}°
                 </p>
 
               </div>
@@ -320,8 +447,8 @@ export function Weather() {
           </div>
 
         </div>
-      </section>
 
+      </section>
 
       {/* ================================================= */}
       {/* MAIN */}
@@ -329,21 +456,25 @@ export function Weather() {
 
       <main className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 -mt-8 relative z-10 pb-16">
 
-
         {/* ================================================= */}
         {/* WEATHER STATS */}
         {/* ================================================= */}
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 
-          {/* Humidity */}
+          {/* HUMIDITY */}
 
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
 
             <div className="flex items-center justify-between">
 
               <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Droplets className="text-blue-600" size={22} />
+
+                <Droplets
+                  className="text-blue-600"
+                  size={22}
+                />
+
               </div>
 
               <span className="text-xs font-semibold text-slate-400">
@@ -362,15 +493,19 @@ export function Weather() {
 
           </div>
 
-
-          {/* Wind */}
+          {/* WIND */}
 
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
 
             <div className="flex items-center justify-between">
 
               <div className="w-11 h-11 rounded-xl bg-cyan-50 flex items-center justify-center">
-                <Wind className="text-cyan-600" size={22} />
+
+                <Wind
+                  className="text-cyan-600"
+                  size={22}
+                />
+
               </div>
 
               <span className="text-xs font-semibold text-slate-400">
@@ -380,7 +515,10 @@ export function Weather() {
             </div>
 
             <p className="text-3xl font-bold text-slate-900 mt-4">
-              {Math.round(current.wind_speed_10m)}
+              {Math.round(
+                current.wind_speed_10m
+              )}
+
               <span className="text-base ml-1">
                 km/h
               </span>
@@ -392,15 +530,19 @@ export function Weather() {
 
           </div>
 
-
-          {/* Rain */}
+          {/* RAIN */}
 
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
 
             <div className="flex items-center justify-between">
 
               <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center">
-                <Umbrella className="text-indigo-600" size={22} />
+
+                <Umbrella
+                  className="text-indigo-600"
+                  size={22}
+                />
+
               </div>
 
               <span className="text-xs font-semibold text-slate-400">
@@ -419,15 +561,19 @@ export function Weather() {
 
           </div>
 
-
-          {/* Temperature */}
+          {/* TEMPERATURE */}
 
           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
 
             <div className="flex items-center justify-between">
 
               <div className="w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center">
-                <Thermometer className="text-orange-600" size={22} />
+
+                <Thermometer
+                  className="text-orange-600"
+                  size={22}
+                />
+
               </div>
 
               <span className="text-xs font-semibold text-slate-400">
@@ -448,21 +594,22 @@ export function Weather() {
 
         </section>
 
-
         {/* ================================================= */}
         {/* ALERT + FARMING ADVISORY */}
         {/* ================================================= */}
 
         <section className="grid lg:grid-cols-2 gap-5 mt-7">
 
-          {/* Rain Alert */}
+          {/* RAIN ALERT */}
 
           <div className="rounded-3xl bg-linear-to-br from-blue-600 to-indigo-700 text-white p-6 md:p-7 shadow-lg">
 
             <div className="flex items-start justify-between">
 
               <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center">
+
                 <AlertTriangle size={24} />
+
               </div>
 
               <span className="text-xs font-bold bg-white/15 px-3 py-1.5 rounded-full">
@@ -472,33 +619,44 @@ export function Weather() {
             </div>
 
             <h2 className="text-2xl font-bold mt-6">
+
               {tomorrowRain >= 60
                 ? "Rain expected tomorrow"
                 : "No major rain alert"}
+
             </h2>
 
             <p className="text-blue-100 mt-2 leading-relaxed">
+
               {tomorrowRain >= 60
                 ? `Rain probability may reach ${tomorrowRain}% tomorrow. Plan irrigation and field activities accordingly.`
                 : "Weather conditions look relatively stable. Continue monitoring rainfall before major farm activities."}
+
             </p>
 
             <div className="mt-6 flex items-center gap-2 text-sm font-semibold">
+
               <ArrowUpRight size={17} />
+
               Plan ahead
+
             </div>
 
           </div>
 
-
-          {/* Farming Advisory */}
+          {/* FARMING ADVISORY */}
 
           <div className="rounded-3xl bg-linear-to-br from-emerald-50 to-green-100 border border-green-200 p-6 md:p-7">
 
             <div className="flex items-start justify-between">
 
               <div className="w-12 h-12 rounded-2xl bg-green-600 flex items-center justify-center">
-                <Sprout className="text-white" size={24} />
+
+                <Sprout
+                  className="text-white"
+                  size={24}
+                />
+
               </div>
 
               <span className="text-xs font-bold text-green-700 bg-green-200/60 px-3 py-1.5 rounded-full">
@@ -512,20 +670,25 @@ export function Weather() {
             </h2>
 
             <p className="text-slate-600 mt-2 leading-relaxed">
-              Current humidity is {current.relative_humidity_2m}%.
+
+              Current humidity is{" "}
+              {current.relative_humidity_2m}%.
               Monitor crop moisture and avoid unnecessary irrigation
               when rainfall is expected.
+
             </p>
 
             <div className="flex items-center gap-2 mt-5 text-green-700 font-semibold text-sm">
+
               <CheckCircle2 size={18} />
+
               Weather-aware farming
+
             </div>
 
           </div>
 
         </section>
-
 
         {/* ================================================= */}
         {/* HOURLY FORECAST */}
@@ -536,6 +699,7 @@ export function Weather() {
           <div className="flex items-end justify-between mb-5">
 
             <div>
+
               <p className="text-sm font-bold uppercase tracking-wider text-green-600">
                 Next hours
               </p>
@@ -543,80 +707,117 @@ export function Weather() {
               <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">
                 Hourly Forecast
               </h2>
+
             </div>
 
-            <CloudSun className="text-green-600" size={28} />
+            <CloudSun
+              className="text-green-600"
+              size={28}
+            />
 
           </div>
-
 
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-x-auto">
 
             <div className="flex min-w-max">
 
-              {nextHours.map((hour, index) => {
+              {nextHours.map(
+                (hour, index) => {
 
-                const hourLabel = new Date(hour.time).toLocaleTimeString(
-                  "en-US",
-                  {
-                    hour: "numeric",
-                  }
-                );
+                  const hourLabel =
+                    new Date(
+                      hour.time
+                    ).toLocaleTimeString(
+                      "en-US",
+                      {
+                        hour: "numeric",
+                      }
+                    );
 
-                return (
-                  <div
-                    key={hour.time}
-                    className={`w-28 md:w-32 p-5 text-center border-r border-slate-100 last:border-r-0 ${
-                      index === 0
-                        ? "bg-green-50"
-                        : "bg-white"
-                    }`}
-                  >
+                  const night = isNightTime(
+                    hour.time,
+                    daily.sunrise[0],
+                    daily.sunset[0]
+                  );
 
-                    <p className="text-sm font-semibold text-slate-500">
-                      {index === 0 ? "Now" : hourLabel}
-                    </p>
+                  return (
+                    <div
+                      key={hour.time}
+                      className={`w-28 md:w-32 p-5 text-center border-r border-slate-100 last:border-r-0 ${
+                        index === 0
+                          ? "bg-green-50"
+                          : "bg-white"
+                      }`}
+                    >
 
-                    <div className="flex justify-center my-4">
-                      {hour.rain >= 50 ? (
-                        <CloudRain
-                          className="text-blue-500"
-                          size={27}
-                        />
-                      ) : hour.rain >= 25 ? (
-                        <CloudSun
-                          className="text-amber-500"
-                          size={27}
-                        />
-                      ) : (
-                        <Sun
-                          className="text-orange-500"
-                          size={27}
-                        />
-                      )}
+                      <p className="text-sm font-semibold text-slate-500">
+                        {index === 0
+                          ? "Now"
+                          : hourLabel}
+                      </p>
+
+                      {/* WEATHER ICON */}
+
+                      <div className="flex justify-center my-4">
+
+                        {hour.rain >= 50 ? (
+
+                          <CloudRain
+                            className="text-blue-500"
+                            size={27}
+                          />
+
+                        ) : night ? (
+
+                          <Moon
+                            className="text-indigo-500"
+                            size={27}
+                          />
+
+                        ) : hour.rain >= 25 ? (
+
+                          <CloudSun
+                            className="text-amber-500"
+                            size={27}
+                          />
+
+                        ) : (
+
+                          <Sun
+                            className="text-orange-500"
+                            size={27}
+                          />
+
+                        )}
+
+                      </div>
+
+                      <p className="text-xl font-bold text-slate-900">
+                        {Math.round(
+                          hour.temperature
+                        )}°
+                      </p>
+
+                      <div className="flex items-center justify-center gap-1 mt-3 text-blue-600">
+
+                        <Droplets size={13} />
+
+                        <span className="text-xs font-semibold">
+                          {hour.rain}%
+                        </span>
+
+                      </div>
+
                     </div>
-
-                    <p className="text-xl font-bold text-slate-900">
-                      {Math.round(hour.temperature)}°
-                    </p>
-
-                    <div className="flex items-center justify-center gap-1 mt-3 text-blue-600">
-                      <Droplets size={13} />
-                      <span className="text-xs font-semibold">
-                        {hour.rain}%
-                      </span>
-                    </div>
-
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
 
             </div>
 
           </div>
 
         </section>
-
 
         {/* ================================================= */}
         {/* WEATHER TREND */}
@@ -636,79 +837,94 @@ export function Weather() {
 
           </div>
 
-
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8">
 
             <div className="space-y-5">
 
-              {daily.time.slice(0, 7).map((date, index) => {
+              {daily.time
+                .slice(0, 7)
+                .map(
+                  (date, index) => {
 
-                const max =
-                  Math.round(
-                    daily.temperature_2m_max[index]
-                  );
-
-                const min =
-                  Math.round(
-                    daily.temperature_2m_min[index]
-                  );
-
-                const width = Math.min(
-                  100,
-                  Math.max(20, (max / 45) * 100)
-                );
-
-                const day =
-                  index === 0
-                    ? "Today"
-                    : new Date(date).toLocaleDateString(
-                        "en-US",
-                        {
-                          weekday: "short",
-                        }
+                    const max =
+                      Math.round(
+                        daily
+                          .temperature_2m_max[
+                          index
+                        ]
                       );
 
-                return (
-                  <div
-                    key={date}
-                    className="grid grid-cols-[55px_1fr_70px] md:grid-cols-[80px_1fr_90px] gap-4 items-center"
-                  >
+                    const min =
+                      Math.round(
+                        daily
+                          .temperature_2m_min[
+                          index
+                        ]
+                      );
 
-                    <span className="font-semibold text-slate-700 text-sm">
-                      {day}
-                    </span>
+                    const width = Math.min(
+                      100,
+                      Math.max(
+                        20,
+                        (max / 45) * 100
+                      )
+                    );
 
-                    <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    const day =
+                      index === 0
+                        ? "Today"
+                        : new Date(
+                            date
+                          ).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                            }
+                          );
 
+                    return (
                       <div
-                        className="h-full rounded-full bg-linear-to-r from-emerald-400 to-green-600 transition-all"
-                        style={{
-                          width: `${width}%`,
-                        }}
-                      />
+                        key={date}
+                        className="grid grid-cols-[55px_1fr_70px] md:grid-cols-[80px_1fr_90px] gap-4 items-center"
+                      >
 
-                    </div>
+                        <span className="font-semibold text-slate-700 text-sm">
+                          {day}
+                        </span>
 
-                    <div className="text-right">
-                      <span className="font-bold text-slate-900">
-                        {max}°
-                      </span>
+                        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
 
-                      <span className="text-sm text-slate-400 ml-1">
-                        {min}°
-                      </span>
-                    </div>
+                          <div
+                            className="h-full rounded-full bg-linear-to-r from-emerald-400 to-green-600 transition-all"
+                            style={{
+                              width: `${width}%`,
+                            }}
+                          />
 
-                  </div>
-                );
-              })}
+                        </div>
+
+                        <div className="text-right">
+
+                          <span className="font-bold text-slate-900">
+                            {max}°
+                          </span>
+
+                          <span className="text-sm text-slate-400 ml-1">
+                            {min}°
+                          </span>
+
+                        </div>
+
+                      </div>
+                    );
+                  }
+                )}
 
             </div>
 
           </div>
 
         </section>
-
 
         {/* ================================================= */}
         {/* CROP SUITABILITY */}
@@ -728,10 +944,9 @@ export function Weather() {
 
           </div>
 
-
           <div className="grid md:grid-cols-3 gap-5">
 
-            {/* Rice */}
+            {/* RICE */}
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 hover:-translate-y-1 hover:shadow-lg transition">
 
@@ -756,21 +971,27 @@ export function Weather() {
               </p>
 
               <div className="h-2 bg-slate-100 rounded-full mt-5 overflow-hidden">
+
                 <div
                   className="h-full bg-green-500 rounded-full"
-                  style={{ width: "82%" }}
+                  style={{
+                    width: "82%",
+                  }}
                 />
+
               </div>
 
               <div className="flex items-center gap-2 mt-4 text-sm text-green-700 font-medium">
+
                 <CheckCircle2 size={16} />
+
                 Favorable conditions
+
               </div>
 
             </div>
 
-
-            {/* Vegetables */}
+            {/* VEGETABLES */}
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 hover:-translate-y-1 hover:shadow-lg transition">
 
@@ -795,21 +1016,27 @@ export function Weather() {
               </p>
 
               <div className="h-2 bg-slate-100 rounded-full mt-5 overflow-hidden">
+
                 <div
                   className="h-full bg-emerald-500 rounded-full"
-                  style={{ width: "76%" }}
+                  style={{
+                    width: "76%",
+                  }}
                 />
+
               </div>
 
               <div className="flex items-center gap-2 mt-4 text-sm text-emerald-700 font-medium">
+
                 <CheckCircle2 size={16} />
+
                 Good conditions
+
               </div>
 
             </div>
 
-
-            {/* Wheat */}
+            {/* WHEAT */}
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 hover:-translate-y-1 hover:shadow-lg transition">
 
@@ -834,15 +1061,22 @@ export function Weather() {
               </p>
 
               <div className="h-2 bg-slate-100 rounded-full mt-5 overflow-hidden">
+
                 <div
                   className="h-full bg-amber-500 rounded-full"
-                  style={{ width: "68%" }}
+                  style={{
+                    width: "68%",
+                  }}
                 />
+
               </div>
 
               <div className="flex items-center gap-2 mt-4 text-sm text-amber-700 font-medium">
+
                 <CheckCircle2 size={16} />
+
                 Monitor conditions
+
               </div>
 
             </div>
@@ -851,19 +1085,25 @@ export function Weather() {
 
         </section>
 
-
         {/* ================================================= */}
         {/* SUNRISE / SUNSET */}
         {/* ================================================= */}
 
         <section className="grid md:grid-cols-2 gap-5 mt-10">
 
+          {/* SUNRISE */}
+
           <div className="bg-linear-to-br from-orange-50 to-amber-100 rounded-3xl p-6 border border-orange-100">
 
             <div className="flex items-center gap-4">
 
               <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center">
-                <Sunrise className="text-white" size={25} />
+
+                <Sunrise
+                  className="text-white"
+                  size={25}
+                />
+
               </div>
 
               <div>
@@ -873,13 +1113,17 @@ export function Weather() {
                 </p>
 
                 <p className="text-xl font-bold text-slate-900">
-                  {new Date(daily.sunrise[0]).toLocaleTimeString(
+
+                  {new Date(
+                    daily.sunrise[0]
+                  ).toLocaleTimeString(
                     "en-US",
                     {
                       hour: "numeric",
                       minute: "2-digit",
                     }
                   )}
+
                 </p>
 
               </div>
@@ -888,13 +1132,19 @@ export function Weather() {
 
           </div>
 
+          {/* SUNSET */}
 
           <div className="bg-linear-to-br from-indigo-50 to-purple-100 rounded-3xl p-6 border border-indigo-100">
 
             <div className="flex items-center gap-4">
 
               <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center">
-                <Sunset className="text-white" size={25} />
+
+                <Sunset
+                  className="text-white"
+                  size={25}
+                />
+
               </div>
 
               <div>
@@ -904,13 +1154,17 @@ export function Weather() {
                 </p>
 
                 <p className="text-xl font-bold text-slate-900">
-                  {new Date(daily.sunset[0]).toLocaleTimeString(
+
+                  {new Date(
+                    daily.sunset[0]
+                  ).toLocaleTimeString(
                     "en-US",
                     {
                       hour: "numeric",
                       minute: "2-digit",
                     }
                   )}
+
                 </p>
 
               </div>
@@ -921,9 +1175,8 @@ export function Weather() {
 
         </section>
 
-
         {/* ================================================= */}
-        {/* FOOTER NOTE */}
+        {/* FOOTER */}
         {/* ================================================= */}
 
         <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-slate-400">
@@ -933,13 +1186,17 @@ export function Weather() {
           </p>
 
           <div className="flex items-center gap-2">
+
             <MapPin size={15} />
+
             Kolkata, West Bengal
+
           </div>
 
         </div>
 
       </main>
+
     </div>
   );
 }
