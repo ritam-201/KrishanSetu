@@ -24,8 +24,8 @@ import  RegisterPage  from './pages/farmerPage/RegisterPage';
 
 // Components
 import { AiAssistant } from './components/farmerPortal/AiAssistant';
-import { OfflineBanner } from './components/farmerPortal/OfflineBanner';
-import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import { OfflineBanner } from './components/OfflineBanner';
+import { AdminProtectedRoute } from './components/adminPortal/AdminProtectedRoute';
 import { Weather } from './components/Weather';
 
 // Scroll to top helper on navigation

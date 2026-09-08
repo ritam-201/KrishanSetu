@@ -7,7 +7,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export const ProblemSolution: React.FC = () => {
   const { t } = useAuth();

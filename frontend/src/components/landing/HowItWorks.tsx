@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export const HowItWorks: React.FC = () => {
   const { t } = useAuth();
@@ -84,7 +84,7 @@ export const HowItWorks: React.FC = () => {
               return (
                 <div key={step.num} className="group relative">
                   {/* Step number */}
-                  <div className="relative z-10 mx-auto mb-7 flex h- w- items-center justify-center rounded-full border-8 border-white bg-emerald-50 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-600">
+                  <div className="relative z-10 mx-auto mb-7 flex h-21 w-21 items-center justify-center rounded-full border-8 border-white bg-emerald-50 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-600">
                     <Icon className="h-7 w-7 text-emerald-600 transition-colors duration-300 group-hover:text-white" />
 
                     <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-900 text-[10px] font-bold text-white">

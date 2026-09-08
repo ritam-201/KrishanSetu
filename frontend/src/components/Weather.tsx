@@ -216,7 +216,7 @@ export function Weather() {
       {/* HERO */}
       {/* ================================================= */}
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-green-900 to-emerald-700 text-white">
+      <section className="relative overflow-hidden bg-linear-to-br from-emerald-950 via-green-900 to-emerald-700 text-white">
 
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-emerald-300/10 blur-3xl" />
 
@@ -274,7 +274,7 @@ export function Weather() {
 
             <div className="lg:justify-self-end">
 
-              <div className="bg-white/10 backdrop-blur-xl border border-white/15 rounded-3xl p-6 md:p-8 min-w-[300px]">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/15 rounded-3xl p-6 md:p-8 min-w-75">
 
                 <div className="flex items-center justify-between">
 
@@ -457,7 +457,7 @@ export function Weather() {
 
           {/* Rain Alert */}
 
-          <div className="rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 md:p-7 shadow-lg">
+          <div className="rounded-3xl bg-linear-to-br from-blue-600 to-indigo-700 text-white p-6 md:p-7 shadow-lg">
 
             <div className="flex items-start justify-between">
 
@@ -493,7 +493,7 @@ export function Weather() {
 
           {/* Farming Advisory */}
 
-          <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-green-100 border border-green-200 p-6 md:p-7">
+          <div className="rounded-3xl bg-linear-to-br from-emerald-50 to-green-100 border border-green-200 p-6 md:p-7">
 
             <div className="flex items-start justify-between">
 
@@ -681,7 +681,7 @@ export function Weather() {
                     <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
 
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-green-600 transition-all"
+                        className="h-full rounded-full bg-linear-to-r from-emerald-400 to-green-600 transition-all"
                         style={{
                           width: `${width}%`,
                         }}
@@ -858,7 +858,7 @@ export function Weather() {
 
         <section className="grid md:grid-cols-2 gap-5 mt-10">
 
-          <div className="bg-gradient-to-br from-orange-50 to-amber-100 rounded-3xl p-6 border border-orange-100">
+          <div className="bg-linear-to-br from-orange-50 to-amber-100 rounded-3xl p-6 border border-orange-100">
 
             <div className="flex items-center gap-4">
 
@@ -889,7 +889,7 @@ export function Weather() {
           </div>
 
 
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-100 rounded-3xl p-6 border border-indigo-100">
+          <div className="bg-linear-to-br from-indigo-50 to-purple-100 rounded-3xl p-6 border border-indigo-100">
 
             <div className="flex items-center gap-4">
 
