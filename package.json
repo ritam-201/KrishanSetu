@@ -1,0 +1,24 @@
+{
+  "name": "kishansetu",
+  "version": "1.0.0",
+  "description": "[![Platform](https://img.shields.io/badge/Platform-State%20Mandi%20APMC-1B4D2A.svg)](https://kisansetu.gov.in) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Status](https://img.shields.io/badge/Hackathon-Production%20Ready-emerald.svg)]()",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ritam-201/KrishanSetu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ritam-201/KrishanSetu/issues"
+  },
+  "homepage": "https://github.com/ritam-201/KrishanSetu#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
