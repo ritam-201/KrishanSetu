@@ -31,7 +31,7 @@ import type {
   CropDetail,
   CropType,
   DetailedFarmerProfile,
-} from "../types";
+} from "../../types";
 
 /* =========================================================
    TYPES
@@ -151,26 +151,31 @@ const STEPS = [
     number: 1,
     title: "Personal",
     subtitle: "Basic details",
+    icon: UserRound,
   },
   {
     number: 2,
     title: "Address",
     subtitle: "Location",
+    icon: MapPin,
   },
   {
     number: 3,
     title: "Farm",
     subtitle: "Land details",
+    icon: LandPlot,
   },
   {
     number: 4,
     title: "Crop",
     subtitle: "Harvest details",
+    icon: Wheat,
   },
   {
     number: 5,
     title: "Bank & Submit",
     subtitle: "DBT details",
+    icon: Banknote,
   },
 ];
 
@@ -842,54 +847,70 @@ const RegisterPage: React.FC = () => {
 
   if (registered) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-2xl">
-          <div className="relative overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-            <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-emerald-400 via-green-500 to-lime-400" />
+      <div
+        className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10"
+        style={{
+          backgroundImage:
+            "linear-gradient(135deg, rgba(2,44,34,.94), rgba(6,78,59,.90)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=85')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/10" />
 
-            <div className="px-6 py-12 text-center sm:px-12">
-              <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50">
-                <CheckCircle2
-                  className="h-14 w-14 text-emerald-500"
-                  strokeWidth={1.8}
-                />
+        <div className="relative w-full max-w-3xl">
+          <div className="overflow-hidden rounded-[36px] border border-white/20 bg-white/95 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+            <div className="h-2 bg-linear-to-r from-lime-400 via-emerald-500 to-green-700" />
+
+            <div className="px-6 py-12 text-center sm:px-14 sm:py-14">
+              <div className="mx-auto mb-7 flex h-28 w-28 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-100/60">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500 shadow-xl shadow-emerald-500/30">
+                  <CheckCircle2
+                    className="h-12 w-12 text-white"
+                    strokeWidth={2}
+                  />
+                </div>
               </div>
 
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700">
                 <BadgeCheck className="h-4 w-4" />
                 Registration Successful
               </div>
 
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                Welcome to KisanSetu,
-                <span className="mt-1 block text-emerald-600">
-                  {form.name}
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
+                Welcome to Kisan
+                <span className="text-emerald-600">
+                  Setu
                 </span>
               </h1>
 
-              <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
+              <p className="mt-3 text-lg font-semibold text-slate-700">
+                {form.name}
+              </p>
+
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
                 Your farmer profile has been successfully
                 registered. Your procurement preferences and
                 DBT details have been securely saved.
               </p>
 
-              <div className="mt-8 grid gap-3 text-left sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-medium text-slate-500">
+              <div className="mt-9 grid gap-4 text-left sm:grid-cols-2">
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
                     Farmer Registration Number
                   </p>
 
-                  <p className="mt-1 font-semibold text-slate-900">
+                  <p className="mt-2 text-lg font-black tracking-wide text-slate-900">
                     {registrationNumber}
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-medium text-slate-500">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Primary Crop
                   </p>
 
-                  <p className="mt-1 font-semibold text-slate-900">
+                  <p className="mt-2 text-lg font-bold text-slate-900">
                     {form.crop}
                   </p>
                 </div>
@@ -898,17 +919,17 @@ const RegisterPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600 active:scale-[0.99]"
+                className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-linear-to-r from-emerald-500 to-green-600 px-6 py-4 text-sm font-bold text-white shadow-xl shadow-emerald-500/25 transition duration-300 hover:-translate-y-0.5 hover:from-emerald-600 hover:to-green-700 active:scale-[0.99]"
               >
                 <Home className="h-5 w-5" />
                 Go to Home Page
                 <ArrowRight className="h-5 w-5" />
               </button>
 
-              <p className="mt-4 text-xs text-slate-400">
-                You can access your farmer information from
-                your account after returning home.
-              </p>
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
+                <LockKeyhole className="h-3.5 w-3.5" />
+                Your farmer information is securely stored.
+              </div>
             </div>
           </div>
         </div>
@@ -920,156 +941,217 @@ const RegisterPage: React.FC = () => {
      MAIN UI
   ======================================================= */
 
+  const ActiveStepIcon =
+    STEPS[step - 1]?.icon || UserRound;
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-emerald-200/30 blur-3xl" />
+    <div className="min-h-screen overflow-x-hidden bg-[#f5f8f4] text-slate-900">
+      {/* =====================================================
+          PREMIUM BACKGROUND
+      ===================================================== */}
 
-        <div className="absolute -right-32 top-1/3 h-96 w-96 rounded-full bg-green-200/25 blur-3xl" />
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.055]"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
 
-        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-lime-200/20 blur-3xl" />
+        <div className="absolute -left-48 -top-48 h-[550px] w-[550px] rounded-full bg-emerald-300/20 blur-3xl" />
+
+        <div className="absolute -right-48 top-[20%] h-[550px] w-[550px] rounded-full bg-lime-300/20 blur-3xl" />
+
+        <div className="absolute bottom-[-250px] left-[30%] h-[500px] w-[500px] rounded-full bg-green-300/15 blur-3xl" />
       </div>
 
-      {/* Header */}
-      <header className="relative border-b border-slate-200 bg-white/90 backdrop-blur-xl">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 shadow-sm backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-emerald-600"
+            className="group inline-flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-semibold text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 transition group-hover:bg-emerald-100">
+              <ArrowLeft className="h-4 w-4" />
+            </span>
+
+            <span className="hidden sm:block">
+              Back to Home
+            </span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 ring-1 ring-emerald-200">
-              <Sprout className="h-5 w-5 text-emerald-600" />
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-500 to-green-700 shadow-lg shadow-emerald-500/20">
+              <Sprout
+                className="h-6 w-6 text-white"
+                strokeWidth={2}
+              />
+
+              <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-white bg-lime-400" />
             </div>
 
-            <span className="hidden font-bold tracking-tight text-slate-900 sm:block">
-              Kisan<span className="text-emerald-600">Setu</span>
-            </span>
+            <div>
+              <p className="text-lg font-black tracking-tight text-slate-900">
+                Kisan<span className="text-emerald-600">Setu</span>
+              </p>
+
+              <p className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:block">
+                Farmer Portal
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 sm:flex">
+            <ShieldCheck className="h-4 w-4" />
+            Secure Registration
           </div>
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        {/* Heading */}
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-            <ShieldCheck className="h-4 w-4" />
-            Secure Farmer Registration
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        {/* ===================================================
+            HERO
+        =================================================== */}
+
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-700 shadow-sm backdrop-blur">
+            <Leaf className="h-4 w-4" />
+            Digital Farmer Registration
           </div>
 
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-            Register with{" "}
-            <span className="text-emerald-600">
+          <h1 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl">
+            Grow with{" "}
+            <span className="bg-linear-to-r from-emerald-500 via-green-600 to-lime-600 bg-clip-text text-transparent">
               KisanSetu
             </span>
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
             Create your farmer profile, register your crop,
             choose a procurement slot and connect your bank
             account for direct benefit transfer.
           </p>
         </div>
 
-        {/* Progress */}
-        <div className="mx-auto mt-10 max-w-5xl">
-          <div className="hidden items-center md:flex">
-            {STEPS.map((item, index) => {
-              const completed =
-                step > item.number;
+        {/* ===================================================
+            DESKTOP STEPPER
+        =================================================== */}
 
-              const active =
-                step === item.number;
+        <div className="mx-auto mt-10 hidden max-w-6xl md:block">
+          <div className="rounded-[28px] border border-white/80 bg-white/75 p-5 shadow-xl shadow-slate-200/40 backdrop-blur-xl">
+            <div className="flex items-center">
+              {STEPS.map((item, index) => {
+                const completed =
+                  step > item.number;
 
-              return (
-                <React.Fragment key={item.number}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (item.number < step) {
-                        setStep(item.number);
-                        setErrors({});
-                      }
-                    }}
-                    className="flex min-w-0 items-center gap-3 text-left"
-                  >
-                    <div
-                      className={[
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold transition",
-                        completed
-                          ? "border-emerald-500 bg-emerald-500 text-white"
-                          : active
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-4 ring-emerald-50"
-                            : "border-slate-200 bg-white text-slate-400",
-                      ].join(" ")}
+                const active =
+                  step === item.number;
+
+                const StepIcon = item.icon;
+
+                return (
+                  <React.Fragment key={item.number}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (item.number < step) {
+                          setStep(item.number);
+                          setErrors({});
+                        }
+                      }}
+                      className="group flex min-w-0 flex-1 items-center gap-3 text-left"
                     >
-                      {completed ? (
-                        <Check className="h-5 w-5" />
-                      ) : (
-                        item.number
-                      )}
-                    </div>
-
-                    <div className="min-w-0">
-                      <p
+                      <div
                         className={[
-                          "text-sm font-semibold",
-                          active || completed
-                            ? "text-slate-900"
-                            : "text-slate-400",
+                          "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border font-bold transition-all duration-300",
+                          completed
+                            ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                            : active
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-4 ring-emerald-100"
+                              : "border-slate-200 bg-white text-slate-400",
                         ].join(" ")}
                       >
-                        {item.title}
-                      </p>
+                        {completed ? (
+                          <Check className="h-5 w-5" />
+                        ) : (
+                          <StepIcon className="h-5 w-5" />
+                        )}
+                      </div>
 
-                      <p className="text-xs text-slate-400">
-                        {item.subtitle}
-                      </p>
-                    </div>
-                  </button>
+                      <div className="min-w-0">
+                        <p
+                          className={[
+                            "truncate text-sm font-bold",
+                            active || completed
+                              ? "text-slate-900"
+                              : "text-slate-400",
+                          ].join(" ")}
+                        >
+                          {item.title}
+                        </p>
 
-                  {index < STEPS.length - 1 && (
-                    <div
-                      className={[
-                        "mx-4 h-px flex-1",
-                        step > item.number
-                          ? "bg-emerald-400"
-                          : "bg-slate-200",
-                      ].join(" ")}
-                    />
-                  )}
-                </React.Fragment>
-              );
-            })}
+                        <p className="mt-0.5 truncate text-xs text-slate-400">
+                          {item.subtitle}
+                        </p>
+                      </div>
+                    </button>
+
+                    {index < STEPS.length - 1 && (
+                      <div
+                        className={[
+                          "mx-3 h-1 w-10 shrink-0 rounded-full transition-all duration-500 lg:mx-5 lg:w-16",
+                          step > item.number
+                            ? "bg-emerald-500"
+                            : "bg-slate-200",
+                        ].join(" ")}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
           </div>
+        </div>
 
-          {/* Mobile Progress */}
-          <div className="md:hidden">
+        {/* ===================================================
+            MOBILE STEPPER
+        =================================================== */}
+
+        <div className="mx-auto mt-8 md:hidden">
+          <div className="rounded-2xl border border-white bg-white/80 p-5 shadow-lg backdrop-blur-xl">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  Step {step} of 5
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                  <ActiveStepIcon className="h-5 w-5" />
+                </div>
 
-                <p className="mt-1 text-xs text-slate-400">
-                  {STEPS[step - 1]?.title}
-                </p>
+                <div>
+                  <p className="text-sm font-black text-slate-900">
+                    Step {step} of 5
+                  </p>
+
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {STEPS[step - 1]?.title}
+                  </p>
+                </div>
               </div>
 
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">
                 {Math.round((step / 5) * 100)}%
               </span>
             </div>
 
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
+            <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                className="h-full rounded-full bg-linear-to-r from-emerald-400 to-green-600 transition-all duration-500"
                 style={{
                   width: `${(step / 5) * 100}%`,
                 }}
@@ -1078,52 +1160,59 @@ const RegisterPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Form Card */}
-        <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-xl shadow-slate-200/50">
-          {/* Card Header */}
-          <div className="border-b border-slate-200 px-5 py-5 sm:px-8">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 ring-1 ring-emerald-100">
-                {step === 1 && (
-                  <UserRound className="h-5 w-5 text-emerald-600" />
-                )}
+        {/* ===================================================
+            FORM CARD
+        =================================================== */}
 
-                {step === 2 && (
-                  <MapPin className="h-5 w-5 text-emerald-600" />
-                )}
+        <div className="mx-auto mt-8 max-w-6xl overflow-hidden rounded-[32px] border border-white/80 bg-white/95 shadow-2xl shadow-slate-300/40 backdrop-blur-xl lg:mt-10">
+          {/* Top accent */}
+          <div className="h-1.5 bg-linear-to-r from-emerald-400 via-green-500 to-lime-400" />
 
-                {step === 3 && (
-                  <LandPlot className="h-5 w-5 text-emerald-600" />
-                )}
+          {/* =================================================
+              FORM HEADER
+          ================================================= */}
 
-                {step === 4 && (
-                  <Wheat className="h-5 w-5 text-emerald-600" />
-                )}
+          <div className="border-b border-slate-100 bg-linear-to-r from-white to-emerald-50/40 px-5 py-6 sm:px-9">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-50 to-green-100 text-emerald-600 ring-1 ring-emerald-100">
+                  <ActiveStepIcon className="h-6 w-6" />
+                </div>
 
-                {step === 5 && (
-                  <Banknote className="h-5 w-5 text-emerald-600" />
-                )}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600">
+                    KisanSetu Registration
+                  </p>
+
+                  <h2 className="mt-1 text-xl font-black text-slate-900 sm:text-2xl">
+                    {STEPS[step - 1]?.title} Information
+                  </h2>
+
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {STEPS[step - 1]?.subtitle}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  {STEPS[step - 1]?.title} Information
-                </h2>
+              <div className="hidden rounded-xl bg-slate-50 px-4 py-2 text-right sm:block">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Progress
+                </p>
 
-                <p className="text-xs text-slate-400">
-                  {STEPS[step - 1]?.subtitle}
+                <p className="text-sm font-black text-emerald-600">
+                  {step}/5
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="px-5 py-7 sm:px-8 sm:py-8">
+          <div className="px-5 py-8 sm:px-9 sm:py-10">
             {/* =================================================
                 STEP 1
             ================================================= */}
 
             {step === 1 && (
-              <div className="space-y-7">
+              <div className="space-y-8">
                 <SectionTitle
                   icon={<User className="h-4 w-4" />}
                   title="Personal information"
@@ -1231,23 +1320,13 @@ const RegisterPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5">
-                  <div className="flex items-start gap-3">
-                    <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Identity verification
-                      </p>
-
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
-                        Your Aadhaar number is used only for
-                        farmer verification and will be masked
-                        in your profile.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <InfoBox
+                  icon={
+                    <LockKeyhole className="h-5 w-5" />
+                  }
+                  title="Identity verification"
+                  description="Your Aadhaar number is used only for farmer verification and will be masked in your profile."
+                />
 
                 <InputField
                   label="Aadhaar Number"
@@ -1270,16 +1349,20 @@ const RegisterPage: React.FC = () => {
                 />
 
                 {form.aadhaarNumber.length >= 4 && (
-                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <p className="text-[11px] uppercase tracking-wider text-slate-400">
+                  <div className="rounded-2xl border border-slate-200 bg-linear-to-r from-slate-50 to-white p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
                       Profile display
                     </p>
 
-                    <p className="mt-1 text-sm font-medium text-slate-700">
-                      {maskAadhaar(
-                        form.aadhaarNumber,
-                      )}
-                    </p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4 text-emerald-500" />
+
+                      <p className="text-sm font-bold tracking-wider text-slate-700">
+                        {maskAadhaar(
+                          form.aadhaarNumber,
+                        )}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1290,7 +1373,7 @@ const RegisterPage: React.FC = () => {
             ================================================= */}
 
             {step === 2 && (
-              <div className="space-y-7">
+              <div className="space-y-8">
                 <SectionTitle
                   icon={<MapPin className="h-4 w-4" />}
                   title="Residential address"
@@ -1384,16 +1467,20 @@ const RegisterPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                  <div className="flex gap-3">
-                    <MapPin className="mt-0.5 h-5 w-5 text-emerald-600" />
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-linear-to-br from-emerald-50 to-green-50 p-5">
+                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-200/30 blur-2xl" />
+
+                  <div className="relative flex gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+                      <MapPin className="h-5 w-5" />
+                    </div>
 
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-black text-slate-900">
                         Location preview
                       </p>
 
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                      <p className="mt-1 text-xs leading-6 text-slate-500">
                         {[
                           form.village,
                           form.block,
@@ -1416,7 +1503,7 @@ const RegisterPage: React.FC = () => {
             ================================================= */}
 
             {step === 3 && (
-              <div className="space-y-7">
+              <div className="space-y-8">
                 <SectionTitle
                   icon={<LandPlot className="h-4 w-4" />}
                   title="Farm information"
@@ -1517,20 +1604,27 @@ const RegisterPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-emerald-200 hover:bg-emerald-50/30">
                   <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Irrigation Available
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+                        <Sprout className="h-5 w-5" />
+                      </div>
 
-                      <p className="mt-1 text-xs text-slate-500">
-                        Does your farm have access to irrigation?
-                      </p>
+                      <div>
+                        <p className="text-sm font-black text-slate-900">
+                          Irrigation Available
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          Does your farm have access to irrigation?
+                        </p>
+                      </div>
                     </div>
 
                     <button
                       type="button"
+                      aria-label="Toggle irrigation"
                       onClick={() =>
                         updateForm(
                           "irrigationAvailable",
@@ -1538,41 +1632,31 @@ const RegisterPage: React.FC = () => {
                         )
                       }
                       className={[
-                        "relative h-7 w-12 rounded-full transition",
+                        "relative h-8 w-14 rounded-full p-1 transition-all duration-300",
                         form.irrigationAvailable
-                          ? "bg-emerald-500"
+                          ? "bg-emerald-500 shadow-lg shadow-emerald-500/20"
                           : "bg-slate-300",
                       ].join(" ")}
                     >
                       <span
                         className={[
-                          "absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition",
+                          "block h-6 w-6 rounded-full bg-white shadow-md transition-all duration-300",
                           form.irrigationAvailable
-                            ? "left-6"
-                            : "left-1",
+                            ? "translate-x-6"
+                            : "translate-x-0",
                         ].join(" ")}
                       />
                     </button>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5">
-                  <div className="flex items-start gap-3">
-                    <Leaf className="mt-0.5 h-5 w-5 text-emerald-600" />
-
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Farm registration
-                      </p>
-
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
-                        These details will be stored inside your
-                        KisanSetu farmer profile and used for
-                        procurement planning.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <InfoBox
+                  icon={
+                    <Leaf className="h-5 w-5" />
+                  }
+                  title="Farm registration"
+                  description="These details will be stored inside your KisanSetu farmer profile and used for procurement planning."
+                />
               </div>
             )}
 
@@ -1581,7 +1665,7 @@ const RegisterPage: React.FC = () => {
             ================================================= */}
 
             {step === 4 && (
-              <div className="space-y-7">
+              <div className="space-y-8">
                 <SectionTitle
                   icon={<Wheat className="h-4 w-4" />}
                   title="Crop & procurement preferences"
@@ -1696,9 +1780,9 @@ const RegisterPage: React.FC = () => {
 
                 {/* Procurement Center */}
                 <div>
-                  <div className="mb-3 flex items-center justify-between">
+                  <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-black text-slate-900">
                         Procurement Center
                         <span className="ml-1 text-rose-500">
                           *
@@ -1711,11 +1795,13 @@ const RegisterPage: React.FC = () => {
                       </p>
                     </div>
 
-                    <MapPin className="h-5 w-5 text-emerald-600" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                      <MapPin className="h-5 w-5" />
+                    </div>
                   </div>
 
                   {centerOptions.length > 0 ? (
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2">
                       {centerOptions.map(
                         (center) => {
                           const selected =
@@ -1733,15 +1819,23 @@ const RegisterPage: React.FC = () => {
                                 )
                               }
                               className={[
-                                "rounded-2xl border p-4 text-left transition",
+                                "group relative overflow-hidden rounded-2xl border p-5 text-left transition-all duration-300",
                                 selected
-                                  ? "border-emerald-400 bg-emerald-50 ring-2 ring-emerald-100"
-                                  : "border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/40",
+                                  ? "border-emerald-400 bg-linear-to-br from-emerald-50 to-green-50 shadow-lg shadow-emerald-500/10 ring-2 ring-emerald-100"
+                                  : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg hover:shadow-slate-200/60",
                               ].join(" ")}
                             >
-                              <div className="flex items-start justify-between gap-3">
+                              {selected && (
+                                <div className="absolute right-0 top-0 h-16 w-16 rounded-bl-[40px] bg-emerald-100/60" />
+                              )}
+
+                              <div className="relative flex items-start justify-between gap-3">
                                 <div>
-                                  <p className="font-semibold text-slate-900">
+                                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+                                    <MapPin className="h-5 w-5" />
+                                  </div>
+
+                                  <p className="font-black text-slate-900">
                                     {center.name}
                                   </p>
 
@@ -1754,7 +1848,7 @@ const RegisterPage: React.FC = () => {
                                 </div>
 
                                 {selected && (
-                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                                     <Check className="h-4 w-4" />
                                   </div>
                                 )}
@@ -1773,7 +1867,7 @@ const RegisterPage: React.FC = () => {
                   )}
 
                   {errors.preferredCenterId && (
-                    <p className="mt-2 text-xs text-rose-500">
+                    <p className="mt-2 text-xs font-medium text-rose-500">
                       {errors.preferredCenterId}
                     </p>
                   )}
@@ -1781,8 +1875,8 @@ const RegisterPage: React.FC = () => {
 
                 {/* Time Slots */}
                 <div>
-                  <div className="mb-3">
-                    <p className="text-sm font-semibold text-slate-900">
+                  <div className="mb-4">
+                    <p className="text-sm font-black text-slate-900">
                       Preferred Time Slot
                       <span className="ml-1 text-rose-500">
                         *
@@ -1812,10 +1906,10 @@ const RegisterPage: React.FC = () => {
                               )
                             }
                             className={[
-                              "rounded-xl border px-4 py-3 text-sm font-medium transition",
+                              "rounded-xl border px-4 py-3 text-sm font-bold transition-all duration-200",
                               selected
-                                ? "border-emerald-500 bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:bg-emerald-50",
+                                ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                : "border-slate-200 bg-white text-slate-600 hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md",
                             ].join(" ")}
                           >
                             {slot}
@@ -1826,7 +1920,7 @@ const RegisterPage: React.FC = () => {
                   </div>
 
                   {errors.preferredTimeSlot && (
-                    <p className="mt-2 text-xs text-rose-500">
+                    <p className="mt-2 text-xs font-medium text-rose-500">
                       {errors.preferredTimeSlot}
                     </p>
                   )}
@@ -1834,7 +1928,7 @@ const RegisterPage: React.FC = () => {
 
                 {/* Notifications */}
                 <div>
-                  <p className="mb-3 text-sm font-semibold text-slate-900">
+                  <p className="mb-4 text-sm font-black text-slate-900">
                     Notification Preference
                   </p>
 
@@ -1860,10 +1954,10 @@ const RegisterPage: React.FC = () => {
                               )
                             }
                             className={[
-                              "rounded-xl border px-4 py-3 text-sm font-medium transition",
+                              "rounded-xl border px-4 py-3 text-sm font-bold transition-all",
                               selected
-                                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                                : "border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:text-emerald-600",
+                                ? "border-emerald-300 bg-emerald-50 text-emerald-700 shadow-sm"
+                                : "border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-600",
                             ].join(" ")}
                           >
                             {method}
@@ -1881,30 +1975,20 @@ const RegisterPage: React.FC = () => {
             ================================================= */}
 
             {step === 5 && (
-              <div className="space-y-7">
+              <div className="space-y-8">
                 <SectionTitle
                   icon={<Banknote className="h-4 w-4" />}
                   title="Bank & DBT details"
                   description="Add your bank account for direct procurement payments."
                 />
 
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5">
-                  <div className="flex items-start gap-3">
-                    <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Secure DBT information
-                      </p>
-
-                      <p className="mt-1 text-xs leading-5 text-slate-500">
-                        Only the last four digits of your bank
-                        account will be displayed in your farmer
-                        profile.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <InfoBox
+                  icon={
+                    <LockKeyhole className="h-5 w-5" />
+                  }
+                  title="Secure DBT information"
+                  description="Only the last four digits of your bank account will be displayed in your farmer profile."
+                />
 
                 <div className="grid gap-5 md:grid-cols-2">
                   <InputField
@@ -1980,9 +2064,15 @@ const RegisterPage: React.FC = () => {
 
                 {/* Documents */}
                 <div>
-                  <p className="mb-3 text-sm font-semibold text-slate-900">
-                    Supporting Documents
-                  </p>
+                  <div className="mb-4">
+                    <p className="text-sm font-black text-slate-900">
+                      Supporting Documents
+                    </p>
+
+                    <p className="mt-1 text-xs text-slate-500">
+                      Upload your supporting documents if available.
+                    </p>
+                  </div>
 
                   <div className="grid gap-4 md:grid-cols-3">
                     <DocumentUpload
@@ -2030,22 +2120,26 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 {/* Summary */}
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Registration Summary
-                      </p>
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                  <div className="border-b border-slate-200 bg-white px-5 py-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-black text-slate-900">
+                          Registration Summary
+                        </p>
 
-                      <p className="mt-1 text-xs text-slate-500">
-                        Review your details before submitting.
-                      </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Review your details before submitting.
+                        </p>
+                      </div>
+
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                        <FileCheck2 className="h-5 w-5" />
+                      </div>
                     </div>
-
-                    <FileCheck2 className="h-5 w-5 text-emerald-600" />
                   </div>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 p-5 sm:grid-cols-2">
                     <SummaryItem
                       label="Farmer"
                       value={form.name}
@@ -2107,7 +2201,7 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 {errors.submit && (
-                  <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+                  <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-medium text-rose-600">
                     {errors.submit}
                   </div>
                 )}
@@ -2115,58 +2209,66 @@ const RegisterPage: React.FC = () => {
             )}
           </div>
 
-          {/* Footer */}
-          <div className="flex flex-col-reverse gap-3 border-t border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <button
-              type="button"
-              onClick={
-                step === 1
-                  ? () => navigate("/")
-                  : handleBack
-              }
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-            >
-              <ArrowLeft className="h-4 w-4" />
+          {/* =================================================
+              FOOTER
+          ================================================= */}
 
-              {step === 1
-                ? "Cancel"
-                : "Previous"}
-            </button>
-
-            {step < 5 ? (
+          <div className="border-t border-slate-100 bg-slate-50/70 px-5 py-5 sm:px-9">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 type="button"
-                onClick={handleNext}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600 active:scale-[0.99]"
+                onClick={
+                  step === 1
+                    ? () => navigate("/")
+                    : handleBack
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
               >
-                Continue
-                <ArrowRight className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" />
+
+                {step === 1
+                  ? "Cancel"
+                  : "Previous"}
               </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Registering...
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-4 w-4" />
-                    Complete Registration
-                  </>
-                )}
-              </button>
-            )}
+
+              {step < 5 ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="inline-flex items-center justify-center gap-3 rounded-xl bg-linear-to-r from-emerald-500 to-green-600 px-7 py-3.5 text-sm font-black text-white shadow-xl shadow-emerald-500/20 transition-all hover:-translate-y-0.5 hover:from-emerald-600 hover:to-green-700 active:translate-y-0"
+                >
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center gap-3 rounded-xl bg-linear-to-r from-emerald-500 to-green-600 px-7 py-3.5 text-sm font-black text-white shadow-xl shadow-emerald-500/20 transition-all hover:-translate-y-0.5 hover:from-emerald-600 hover:to-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Registering...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="h-4 w-4" />
+                      Complete Registration
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Security footer */}
-        <div className="mx-auto mt-6 flex max-w-5xl items-center justify-center gap-2 text-center text-xs text-slate-400">
+        {/* ===================================================
+            SECURITY FOOTER
+        =================================================== */}
+
+        <div className="mx-auto mt-7 flex max-w-6xl flex-wrap items-center justify-center gap-2 text-center text-xs text-slate-400">
           <LockKeyhole className="h-3.5 w-3.5" />
           Your registration data is stored locally in this demo
           application.
@@ -2196,20 +2298,60 @@ const SectionTitle: React.FC<
   return (
     <div>
       <div className="flex items-center gap-2 text-emerald-600">
-        {icon}
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+          {icon}
+        </div>
 
-        <span className="text-xs font-bold uppercase tracking-[0.16em]">
+        <span className="text-[10px] font-black uppercase tracking-[0.18em]">
           KisanSetu Registration
         </span>
       </div>
 
-      <h3 className="mt-2 text-xl font-bold text-slate-900">
+      <h3 className="mt-3 text-2xl font-black tracking-tight text-slate-900">
         {title}
       </h3>
 
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500">
         {description}
       </p>
+    </div>
+  );
+};
+
+/* =========================================================
+   INFO BOX
+========================================================= */
+
+interface InfoBoxProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+const InfoBox: React.FC<InfoBoxProps> = ({
+  icon,
+  title,
+  description,
+}) => {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-linear-to-br from-emerald-50 via-green-50 to-white p-5">
+      <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-200/20 blur-2xl" />
+
+      <div className="relative flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+          {icon}
+        </div>
+
+        <div>
+          <p className="text-sm font-black text-slate-900">
+            {title}
+          </p>
+
+          <p className="mt-1 text-xs leading-6 text-slate-500">
+            {description}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
@@ -2258,8 +2400,8 @@ const InputField: React.FC<
   max,
 }) => {
   return (
-    <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
+    <div className="group">
+      <label className="mb-2.5 block text-xs font-black uppercase tracking-wider text-slate-600">
         {label}
 
         {required && (
@@ -2271,7 +2413,7 @@ const InputField: React.FC<
 
       <div className="relative">
         {icon && (
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-400 transition group-focus-within:text-emerald-500">
             {icon}
           </div>
         )}
@@ -2290,20 +2432,21 @@ const InputField: React.FC<
           min={min}
           max={max}
           className={[
-            "w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400",
+            "w-full rounded-2xl border bg-white px-4 py-3.5 text-sm font-medium text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400",
             icon ? "pl-11" : "",
             error
-              ? "border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"
-              : "border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100",
+              ? "border-rose-300 bg-rose-50/30 focus:border-rose-400 focus:ring-4 focus:ring-rose-100"
+              : "border-slate-200 hover:border-slate-300 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-50",
             disabled
               ? "cursor-not-allowed bg-slate-100 text-slate-400"
-              : "hover:border-slate-300",
+              : "",
           ].join(" ")}
         />
       </div>
 
       {error && (
-        <p className="mt-1.5 text-xs text-rose-500">
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-rose-500">
+          <span className="h-1 w-1 rounded-full bg-rose-500" />
           {error}
         </p>
       )}
@@ -2336,7 +2479,7 @@ const TextAreaField: React.FC<
 }) => {
   return (
     <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
+      <label className="mb-2.5 block text-xs font-black uppercase tracking-wider text-slate-600">
         {label}
 
         {required && (
@@ -2354,17 +2497,18 @@ const TextAreaField: React.FC<
           )
         }
         placeholder={placeholder}
-        rows={3}
+        rows={4}
         className={[
-          "w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400",
+          "w-full resize-none rounded-2xl border bg-white px-4 py-3.5 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400",
           error
-            ? "border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"
-            : "border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100",
+            ? "border-rose-300 bg-rose-50/30 focus:border-rose-400 focus:ring-4 focus:ring-rose-100"
+            : "border-slate-200 hover:border-slate-300 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-50",
         ].join(" ")}
       />
 
       {error && (
-        <p className="mt-1.5 text-xs text-rose-500">
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-rose-500">
+          <span className="h-1 w-1 rounded-full bg-rose-500" />
           {error}
         </p>
       )}
@@ -2399,7 +2543,7 @@ const SelectField: React.FC<
 }) => {
   return (
     <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
+      <label className="mb-2.5 block text-xs font-black uppercase tracking-wider text-slate-600">
         {label}
 
         {required && (
@@ -2418,10 +2562,10 @@ const SelectField: React.FC<
             )
           }
           className={[
-            "w-full appearance-none rounded-xl border bg-white px-4 py-3 pr-10 text-sm text-slate-900 outline-none transition",
+            "w-full appearance-none rounded-2xl border bg-white px-4 py-3.5 pr-11 text-sm font-medium text-slate-900 outline-none transition-all",
             error
-              ? "border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-100"
-              : "border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100",
+              ? "border-rose-300 bg-rose-50/30 focus:border-rose-400 focus:ring-4 focus:ring-rose-100"
+              : "border-slate-200 hover:border-slate-300 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-50",
           ].join(" ")}
         >
           {options.map((option) => (
@@ -2439,7 +2583,8 @@ const SelectField: React.FC<
       </div>
 
       {error && (
-        <p className="mt-1.5 text-xs text-rose-500">
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-rose-500">
+          <span className="h-1 w-1 rounded-full bg-rose-500" />
           {error}
         </p>
       )}
@@ -2469,7 +2614,7 @@ const DocumentUpload: React.FC<
   onChange,
 }) => {
   return (
-    <label className="group relative cursor-pointer rounded-2xl border border-dashed border-slate-300 bg-white p-5 transition hover:border-emerald-300 hover:bg-emerald-50/50">
+    <label className="group relative cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-50/30 hover:shadow-lg hover:shadow-emerald-500/10">
       <input
         type="file"
         accept=".pdf,.jpg,.jpeg,.png"
@@ -2477,15 +2622,22 @@ const DocumentUpload: React.FC<
         className="sr-only"
       />
 
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-emerald-50 group-hover:text-emerald-600">
+      <div
+        className={[
+          "flex h-12 w-12 items-center justify-center rounded-2xl transition-all",
+          file
+            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+            : "bg-slate-100 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-600",
+        ].join(" ")}
+      >
         {file ? (
-          <FileCheck2 className="h-5 w-5 text-emerald-600" />
+          <FileCheck2 className="h-5 w-5" />
         ) : (
           <ImagePlus className="h-5 w-5" />
         )}
       </div>
 
-      <p className="mt-4 text-sm font-semibold text-slate-900">
+      <p className="mt-4 text-sm font-black text-slate-900">
         {title}
       </p>
 
@@ -2494,14 +2646,14 @@ const DocumentUpload: React.FC<
       </p>
 
       {!file && (
-        <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+        <p className="mt-4 inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-600 transition group-hover:bg-emerald-100">
           Upload document
           <ArrowRight className="h-3 w-3" />
         </p>
       )}
 
       {file && (
-        <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+        <div className="mt-4 inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-600">
           Document uploaded
           <Check className="h-3 w-3" />
         </div>
@@ -2526,12 +2678,12 @@ const SummaryItem: React.FC<
   value,
 }) => {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3">
-      <p className="text-[11px] uppercase tracking-wider text-slate-400">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-200 hover:shadow-sm">
+      <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
         {label}
       </p>
 
-      <p className="mt-1 truncate text-sm font-medium text-slate-700">
+      <p className="mt-1.5 truncate text-sm font-bold text-slate-700">
         {value}
       </p>
     </div>

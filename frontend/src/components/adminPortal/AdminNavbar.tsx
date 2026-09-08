@@ -14,12 +14,11 @@ import {
   ChevronDown,
   CheckCircle2,
   LogOut,
-  User,
+  Users,
   ChevronRight,
   Wheat,
   LayoutDashboard,
   CreditCard,
-  Users,
   Clock3,
   BarChart3,
 } from 'lucide-react';
@@ -195,8 +194,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
               className="group flex shrink-0 items-center gap-3"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {/* Logo */}
-
               <div
                 className="
                   relative flex h-11 w-11
@@ -224,8 +221,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                   "
                 />
               </div>
-
-              {/* Brand */}
 
               <div className="hidden sm:block">
                 <div className="flex items-center gap-1">
@@ -386,8 +381,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                     hover:shadow-sm
                   "
                 >
-                  {/* Avatar */}
-
                   <div
                     className="
                       flex h-9 w-9
@@ -406,8 +399,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                       ?.charAt(0)
                       ?.toUpperCase() || 'A'}
                   </div>
-
-                  {/* Name */}
 
                   <div className="hidden text-left xl:block">
                     <p
@@ -608,6 +599,8 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                         Administration
                       </p>
 
+                      {/* Dashboard */}
+
                       <Link
                         to="/admin/dashboard"
                         onClick={() =>
@@ -637,12 +630,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                         </div>
 
                         <div className="flex-1">
-                          <p
-                            className="
-                              text-xs
-                              font-bold
-                            "
-                          >
+                          <p className="text-xs font-bold">
                             Admin Dashboard
                           </p>
 
@@ -664,8 +652,10 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                         />
                       </Link>
 
+                      {/* REGISTERED ADMINS */}
+
                       <Link
-                        to="/admin/farmers"
+                        to="/admin/admins"
                         onClick={() =>
                           setProfileDropdownOpen(false)
                         }
@@ -698,7 +688,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                               font-bold
                             "
                           >
-                            Registered Farmers
+                            Registered Admins
                           </p>
 
                           <p
@@ -707,7 +697,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                               text-slate-400
                             "
                           >
-                            Manage farmer accounts
+                            Manage admin accounts
                           </p>
                         </div>
 
@@ -758,12 +748,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                         </div>
 
                         <div className="flex-1">
-                          <p
-                            className="
-                              text-xs
-                              font-bold
-                            "
-                          >
+                          <p className="text-xs font-bold">
                             Logout Account
                           </p>
 
@@ -926,8 +911,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                   "
                 >
                   <Bell className="h-4.5 w-4.5" />
-
-                  {/* Notification Badge */}
 
                   <span
                     className="
@@ -1196,7 +1179,6 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                 "
               >
                 <LogOut className="h-3.5 w-3.5" />
-
                 Logout
               </button>
 
@@ -1377,8 +1359,10 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                     Administration
                   </p>
 
+                  {/* REGISTERED ADMINS */}
+
                   <Link
-                    to="/admin/farmers"
+                    to="/admin/admins"
                     onClick={() =>
                       setMobileMenuOpen(false)
                     }
@@ -1394,8 +1378,10 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({
                   >
                     <Users className="h-4 w-4" />
 
-                    Farmers
+                    Registered Admins
                   </Link>
+
+                  {/* Reports */}
 
                   <Link
                     to="/admin/reports"

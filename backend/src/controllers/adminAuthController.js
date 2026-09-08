@@ -1,115 +1,465 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { Admin } from '../models/Admin.js';
 import { AuditLog } from '../models/AuditLog.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kisansetu_secret_key_2026';
-const MAX_FAILED_ATTEMPTS = 5;
 
-// Helper to log audit actions
-const logAdminAudit = async (user, role, action, targetEntity, details) => {
+const createAdminToken = (admin) => {
+  return jwt.sign(
+    {
+      adminId: admin.adminId,
+      email: admin.email,
+      role: admin.role,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: '7d',
+    }
+  );
+};
+
+const createAdminId = async () => {
+  const year = new Date().getFullYear();
+
+  const count = await Admin.countDocuments({
+    adminId: new RegExp(`^ADM-${year}-`),
+  });
+
+  return `ADM-${year}-${String(count + 1).padStart(3, '0')}`;
+};
+
+const createAuditLog = async ({
+  user,
+  role,
+  action,
+  targetEntity = '',
+  details = '',
+}) => {
   try {
     await AuditLog.create({
-      logId: `AUD-ADM-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      logId: `LOG-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
       user,
       role,
       action,
       targetEntity,
-      details
+      details,
+      timestamp: new Date(),
     });
-  } catch (err) {
-    console.warn(`[AuditLog Error]: ${err.message}`);
+  } catch (error) {
+    console.error('Audit log error:', error.message);
   }
 };
 
-// 1. Dedicated Admin Login Controller
+/* =========================================================
+   ADMIN LOGIN
+========================================================= */
+
 export const loginAdmin = async (req, res) => {
   try {
-    const { email, password, rememberMe } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Admin ID/Email and password are required.' });
-    }
-
-    const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
-
-    // Security requirement: Do not reveal whether email or password was invalid
-    if (!admin) {
-      return res.status(401).json({ success: false, message: 'Invalid admin credentials.' });
-    }
-
-    // Check if account is locked or disabled
-    if (admin.accountStatus === 'disabled') {
-      return res.status(403).json({ success: false, message: 'Your administrator account has been disabled. Contact system director.' });
-    }
-
-    if (admin.accountStatus === 'locked' && admin.lockUntil && admin.lockUntil > new Date()) {
-      return res.status(423).json({ 
-        success: false, 
-        message: 'Your administrator account has been temporarily locked due to multiple failed login attempts. Please try again later.' 
+      return res.status(400).json({
+        success: false,
+        message: 'Admin email and password are required.',
       });
     }
 
-    // Reset lock if lock duration expired
-    if (admin.accountStatus === 'locked' && admin.lockUntil && admin.lockUntil <= new Date()) {
-      admin.accountStatus = 'active';
-      admin.failedLoginAttempts = 0;
-      admin.lockUntil = null;
+    const cleanEmail = email.trim().toLowerCase();
+
+    const admin = await Admin.findOne({
+      email: cleanEmail,
+    });
+
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid admin credentials.',
+      });
     }
 
-    // Verify Password with bcrypt
-    const isMatch = await bcrypt.compare(password, admin.passwordHash);
+    /* Account status check */
 
-    if (!isMatch) {
+    if (admin.accountStatus === 'disabled') {
+      return res.status(403).json({
+        success: false,
+        message: 'This admin account has been disabled.',
+      });
+    }
+
+    if (
+      admin.accountStatus === 'locked' &&
+      admin.lockUntil &&
+      admin.lockUntil > new Date()
+    ) {
+      return res.status(423).json({
+        success: false,
+        message: 'Account temporarily locked. Please try again later.',
+      });
+    }
+
+    /* Password check */
+
+    const passwordMatches = await bcrypt.compare(
+      password,
+      admin.passwordHash
+    );
+
+    if (!passwordMatches) {
       admin.failedLoginAttempts += 1;
-      
-      // Lock account after MAX_FAILED_ATTEMPTS
-      if (admin.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+
+      if (admin.failedLoginAttempts >= 5) {
         admin.accountStatus = 'locked';
-        admin.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minute lock
-        await admin.save();
-        await logAdminAudit(admin.email, admin.role, 'ACCOUNT_LOCKED', admin.adminId, 'Account locked due to 5 consecutive failed login attempts');
-        return res.status(423).json({ 
-          success: false, 
-          message: 'Your administrator account has been temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.' 
-        });
+        admin.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
       }
 
       await admin.save();
-      await logAdminAudit(admin.email, admin.role, 'FAILED_ADMIN_LOGIN', admin.adminId, `Failed login attempt ${admin.failedLoginAttempts}/${MAX_FAILED_ATTEMPTS}`);
-      return res.status(401).json({ success: false, message: 'Invalid admin credentials.' });
+
+      return res.status(401).json({
+        success: false,
+        message:
+          admin.accountStatus === 'locked'
+            ? 'Too many failed attempts. Account locked for 15 minutes.'
+            : 'Invalid admin credentials.',
+      });
     }
 
-    // Successful Login: Reset failed attempts & create session
+    /* Successful login */
+
     admin.failedLoginAttempts = 0;
+    admin.accountStatus = 'active';
+    admin.lockUntil = null;
     admin.lastLogin = new Date();
 
-    const sessionId = `SESS-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const newSession = {
+    const sessionId = `SESSION-${Date.now()}-${crypto
+      .randomBytes(4)
+      .toString('hex')}`;
+
+    admin.activeSessions.push({
       sessionId,
-      device: req.headers['user-agent']?.includes('Mobile') ? 'Mobile Device' : 'Desktop Workstation',
-      browser: req.headers['user-agent']?.includes('Chrome') ? 'Chrome' : 'Browser',
-      ipAddress: req.ip || '127.0.0.1',
+      device: req.headers['user-agent'] || 'Unknown Device',
+      browser: req.headers['user-agent'] || 'Unknown Browser',
+      ipAddress:
+        req.headers['x-forwarded-for'] ||
+        req.socket?.remoteAddress ||
+        '127.0.0.1',
       loginTime: new Date(),
       lastActivity: new Date(),
-      isCurrent: true
-    };
+      isCurrent: true,
+    });
 
-    admin.activeSessions.push(newSession);
     await admin.save();
 
-    // Generate JWT with adminId, role, and sessionId (no sensitive plain info)
-    const token = jwt.sign(
-      { adminId: admin.adminId, email: admin.email, role: admin.role, sessionId },
-      JWT_SECRET,
-      { expiresIn: rememberMe ? '30d' : '12h' }
-    );
+    const token = createAdminToken(admin);
 
-    await logAdminAudit(admin.fullName, admin.role, 'ADMIN_LOGIN', admin.adminId, 'Successful admin authentication session started');
+    await createAuditLog({
+      user: admin.fullName,
+      role: admin.role,
+      action: 'ADMIN_LOGIN',
+      targetEntity: admin.adminId,
+      details: `${admin.fullName} logged into the admin portal.`,
+    });
 
     return res.json({
       success: true,
+      message: 'Admin login successful.',
       token,
+      admin: {
+        adminId: admin.adminId,
+        fullName: admin.fullName,
+        email: admin.email,
+        phone: admin.phone,
+        role: admin.role,
+        department: admin.department,
+        designation: admin.designation,
+        profilePhoto: admin.profilePhoto,
+        accountStatus: admin.accountStatus,
+        failedLoginAttempts: admin.failedLoginAttempts,
+        lastLogin: admin.lastLogin,
+        passwordChangedAt: admin.passwordChangedAt,
+        twoFactorEnabled: admin.twoFactorEnabled,
+      },
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during admin login.',
+    });
+  }
+};
+
+/* =========================================================
+   ADMIN REGISTRATION
+========================================================= */
+
+export const registerAdmin = async (req, res) => {
+  try {
+    const {
+      fullName,
+      email,
+      phone,
+      department,
+      designation,
+      password,
+      confirmPassword,
+    } = req.body;
+
+    /* Required fields */
+
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !department ||
+      !designation ||
+      !password ||
+      !confirmPassword
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'All registration fields are required.',
+      });
+    }
+
+    const cleanName = fullName.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim();
+    const cleanDepartment = department.trim();
+    const cleanDesignation = designation.trim();
+
+    if (cleanName.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid full name.',
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match.',
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain at least 8 characters.',
+      });
+    }
+
+    const existingAdmin = await Admin.findOne({
+      email: cleanEmail,
+    });
+
+    if (existingAdmin) {
+      return res.status(409).json({
+        success: false,
+        message: 'An admin with this email already exists.',
+      });
+    }
+
+    const adminId = await createAdminId();
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const admin = await Admin.create({
+      adminId,
+      fullName: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      passwordHash,
+      role: 'ADMIN',
+      department: cleanDepartment,
+      designation: cleanDesignation,
+      accountStatus: 'active',
+      failedLoginAttempts: 0,
+      lockUntil: null,
+      twoFactorEnabled: false,
+      passwordChangedAt: new Date(),
+      activeSessions: [],
+    });
+
+    await createAuditLog({
+      user: admin.fullName,
+      role: admin.role,
+      action: 'ADMIN_REGISTERED',
+      targetEntity: admin.adminId,
+      details: `${admin.fullName} registered a new admin account.`,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message:
+        'Admin registration successful. Your account is awaiting administrator access.',
+      admin: {
+        adminId: admin.adminId,
+        fullName: admin.fullName,
+        email: admin.email,
+        phone: admin.phone,
+        role: admin.role,
+        department: admin.department,
+        designation: admin.designation,
+        accountStatus: admin.accountStatus,
+      },
+    });
+  } catch (error) {
+    console.error('Admin registration error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during admin registration.',
+    });
+  }
+};
+
+/* =========================================================
+   GET REGISTERED ADMINS
+   SUPER ADMIN ONLY
+========================================================= */
+
+export const getAdminsList = async (req, res) => {
+  try {
+    const admins = await Admin.find({})
+      .select(
+        '-passwordHash -activeSessions -failedLoginAttempts -lockUntil'
+      )
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
+
+    return res.json({
+      success: true,
+      admins: admins.map((admin) => ({
+        adminId: admin.adminId,
+        fullName: admin.fullName,
+        email: admin.email,
+        phone: admin.phone,
+        role: admin.role,
+        department: admin.department,
+        designation: admin.designation,
+        profilePhoto: admin.profilePhoto,
+        accountStatus: admin.accountStatus,
+        twoFactorEnabled: admin.twoFactorEnabled,
+        lastLogin: admin.lastLogin,
+        passwordChangedAt: admin.passwordChangedAt,
+        createdAt: admin.createdAt,
+        updatedAt: admin.updatedAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Get admins error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to load registered administrators.',
+    });
+  }
+};
+
+/* =========================================================
+   UPDATE ADMIN DETAILS
+   SUPER ADMIN ONLY
+========================================================= */
+
+export const updateAdmin = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+
+    const {
+      fullName,
+      email,
+      phone,
+      department,
+      designation,
+    } = req.body;
+
+    const admin = await Admin.findOne({
+      adminId,
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin account not found.',
+      });
+    }
+
+    /* Validate required fields */
+
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !department ||
+      !designation
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'All admin profile fields are required.',
+      });
+    }
+
+    const cleanName = fullName.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim();
+    const cleanDepartment = department.trim();
+    const cleanDesignation = designation.trim();
+
+    if (cleanName.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid full name.',
+      });
+    }
+
+    /* Check email belongs to another admin */
+
+    const emailOwner = await Admin.findOne({
+      email: cleanEmail,
+      adminId: { $ne: adminId },
+    });
+
+    if (emailOwner) {
+      return res.status(409).json({
+        success: false,
+        message: 'Another admin is already using this email.',
+      });
+    }
+
+    const oldDetails = {
+      fullName: admin.fullName,
+      email: admin.email,
+      phone: admin.phone,
+      department: admin.department,
+      designation: admin.designation,
+    };
+
+    admin.fullName = cleanName;
+    admin.email = cleanEmail;
+    admin.phone = cleanPhone;
+    admin.department = cleanDepartment;
+    admin.designation = cleanDesignation;
+    admin.updatedAt = new Date();
+
+    await admin.save();
+
+    await createAuditLog({
+      user: req.user?.adminId || 'SUPER_ADMIN',
+      role: req.user?.role || 'SUPER_ADMIN',
+      action: 'ADMIN_DETAILS_UPDATED',
+      targetEntity: admin.adminId,
+      details: `Admin details updated for ${admin.fullName}. Previous name: ${oldDetails.fullName}.`,
+    });
+
+    return res.json({
+      success: true,
+      message: 'Admin details updated successfully.',
       admin: {
         adminId: admin.adminId,
         fullName: admin.fullName,
@@ -122,245 +472,261 @@ export const loginAdmin = async (req, res) => {
         accountStatus: admin.accountStatus,
         twoFactorEnabled: admin.twoFactorEnabled,
         lastLogin: admin.lastLogin,
-        passwordChangedAt: admin.passwordChangedAt
-      }
+        passwordChangedAt: admin.passwordChangedAt,
+        createdAt: admin.createdAt,
+        updatedAt: admin.updatedAt,
+      },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
+    console.error('Update admin error:', error);
 
-// 2.a. Admin Registration Controller
-export const registerAdmin = async (req, res) => {
-  try {
-    const {
-      fullName,
-      email,
-      password,
-      confirmPassword
-    } = req.body;
-
-    // Basic validation
-    if (!fullName || !email || !password || !confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Full name, email, password and confirm password are required.'
-      });
-    }
-
-    const cleanName = fullName.trim();
-    const cleanEmail = email.toLowerCase().trim();
-
-    if (password.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password must contain at least 8 characters.'
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Passwords do not match.'
-      });
-    }
-
-    // Check if email already exists
-    const existingAdmin = await Admin.findOne({
-      email: cleanEmail
-    });
-
-    if (existingAdmin) {
-      return res.status(409).json({
-        success: false,
-        message: 'An administrator with this email already exists.'
-      });
-    }
-
-    // Generate unique Admin ID
-    const adminId = `ADM-${new Date().getFullYear()}-${Date.now()
-      .toString()
-      .slice(-6)}`;
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    // Create new admin
-    const admin = await Admin.create({
-      adminId,
-      fullName: cleanName,
-      email: cleanEmail,
-      phone: 'Not provided',
-      passwordHash,
-      role: 'ADMIN',
-      department: 'State Agricultural Marketing Board',
-      designation: 'Administrator',
-      accountStatus: 'active',
-      failedLoginAttempts: 0,
-      lockUntil: null,
-      twoFactorEnabled: false
-    });
-
-    // Audit registration
-    await logAdminAudit(
-      admin.fullName,
-      admin.role,
-      'ADMIN_REGISTERED',
-      admin.adminId,
-      'New administrator account created successfully'
-    );
-
-    return res.status(201).json({
-      success: true,
-      message: 'Admin account created successfully.',
-      admin: {
-        adminId: admin.adminId,
-        fullName: admin.fullName,
-        email: admin.email,
-        role: admin.role
-      }
-    });
-
-  } catch (error) {
-    console.error('[Admin Registration Error]:', error);
-
-    // Handle MongoDB duplicate key errors
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: 'An administrator with this email already exists.'
+        message: 'This email is already registered.',
       });
     }
 
     return res.status(500).json({
       success: false,
-      message: 'Unable to create administrator account.'
+      message: 'Unable to update admin details.',
     });
   }
 };
 
-// 2.b. Logout Admin Controller
-export const logoutAdmin = async (req, res) => {
+/* =========================================================
+   TOGGLE ADMIN STATUS
+   SUPER ADMIN ONLY
+========================================================= */
+
+export const toggleAdminStatus = async (req, res) => {
   try {
-    const adminId = req.user?.adminId || 'ADM-001';
-    await logAdminAudit(req.user?.email || 'Admin', req.user?.role || 'ADMIN', 'ADMIN_LOGOUT', adminId, 'Session ended cleanly');
-    return res.json({ success: true, message: 'Logged out successfully' });
+    const { adminId, status } = req.body;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin ID is required.',
+      });
+    }
+
+    const admin = await Admin.findOne({
+      adminId,
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin account not found.',
+      });
+    }
+
+    /*
+      Do not disable/lock the main SUPER_ADMIN through this endpoint.
+    */
+
+    if (
+      admin.role === 'SUPER_ADMIN' &&
+      admin.adminId === req.user?.adminId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: 'You cannot disable your own Super Admin account.',
+      });
+    }
+
+    if (!['active', 'disabled', 'locked'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid account status.',
+      });
+    }
+
+    admin.accountStatus = status;
+
+    if (status === 'active') {
+      admin.failedLoginAttempts = 0;
+      admin.lockUntil = null;
+    }
+
+    await admin.save();
+
+    await createAuditLog({
+      user: req.user?.adminId || 'SUPER_ADMIN',
+      role: req.user?.role || 'SUPER_ADMIN',
+      action: 'ADMIN_STATUS_CHANGED',
+      targetEntity: admin.adminId,
+      details: `Account status changed to ${status}.`,
+    });
+
+    return res.json({
+      success: true,
+      message: `Admin account ${status === 'active' ? 'activated' : 'updated'} successfully.`,
+      admin: {
+        adminId: admin.adminId,
+        accountStatus: admin.accountStatus,
+      },
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error('Toggle admin status error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to update admin account status.',
+    });
   }
 };
 
-// 3. Change Admin Password
+/* =========================================================
+   ADMIN SESSIONS
+========================================================= */
+
+export const getAdminSessions = async (req, res) => {
+  try {
+    const admin = await Admin.findOne({
+      adminId: req.user.adminId,
+    }).select('activeSessions');
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin account not found.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      sessions: admin.activeSessions || [],
+    });
+  } catch (error) {
+    console.error('Get admin sessions error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to load admin sessions.',
+    });
+  }
+};
+
+/* =========================================================
+   CHANGE ADMIN PASSWORD
+========================================================= */
+
 export const changeAdminPassword = async (req, res) => {
   try {
     const { currentPassword, newPassword, confirmPassword } = req.body;
-    const adminId = req.user?.adminId || 'ADM-2026-001';
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'All password fields are required.',
+      });
+    }
 
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({ success: false, message: 'New password and confirmation do not match.' });
+      return res.status(400).json({
+        success: false,
+        message: 'New passwords do not match.',
+      });
     }
 
     if (newPassword.length < 8) {
-      return res.status(400).json({ success: false, message: 'New password must be at least 8 characters long.' });
+      return res.status(400).json({
+        success: false,
+        message: 'New password must contain at least 8 characters.',
+      });
     }
 
-    const admin = await Admin.findOne({ adminId });
-    if (admin) {
-      const isMatch = await bcrypt.compare(currentPassword, admin.passwordHash);
-      if (!isMatch) {
-        return res.status(400).json({ success: false, message: 'Current password provided is incorrect.' });
+    const admin = await Admin.findOne({
+      adminId: req.user.adminId,
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin account not found.',
+      });
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(
+      currentPassword,
+      admin.passwordHash
+    );
+
+    if (!currentPasswordMatches) {
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect.',
+      });
+    }
+
+    admin.passwordHash = await bcrypt.hash(newPassword, 12);
+    admin.passwordChangedAt = new Date();
+
+    await admin.save();
+
+    await createAuditLog({
+      user: admin.fullName,
+      role: admin.role,
+      action: 'ADMIN_PASSWORD_CHANGED',
+      targetEntity: admin.adminId,
+      details: 'Admin password was changed successfully.',
+    });
+
+    return res.json({
+      success: true,
+      message: 'Password changed successfully.',
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to change password.',
+    });
+  }
+};
+
+/* =========================================================
+   ADMIN LOGOUT
+========================================================= */
+
+export const logoutAdmin = async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+
+    if (req.user?.adminId) {
+      const admin = await Admin.findOne({
+        adminId: req.user.adminId,
+      });
+
+      if (admin && sessionId) {
+        admin.activeSessions = admin.activeSessions.filter(
+          (session) => session.sessionId !== sessionId
+        );
+
+        await admin.save();
       }
 
-      const salt = await bcrypt.genSalt(10);
-      admin.passwordHash = await bcrypt.hash(newPassword, salt);
-      admin.passwordChangedAt = new Date();
-      await admin.save();
+      await createAuditLog({
+        user: admin?.fullName || req.user.adminId,
+        role: admin?.role || req.user.role,
+        action: 'ADMIN_LOGOUT',
+        targetEntity: req.user.adminId,
+        details: 'Admin logged out of the portal.',
+      });
     }
 
-    await logAdminAudit(adminId, req.user?.role || 'ADMIN', 'PASSWORD_CHANGED', adminId, 'Administrator password updated securely');
-
-    return res.json({ success: true, message: 'Password changed successfully. Please log in with your new password.' });
+    return res.json({
+      success: true,
+      message: 'Admin logged out successfully.',
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
+    console.error('Admin logout error:', error);
 
-// 4. Manage Admins List (SUPER_ADMIN only)
-export const getAdminsList = async (req, res) => {
-  try {
-    // Return sample admins list
-    const admins = [
-      {
-        adminId: 'ADM-2026-001',
-        fullName: 'Siddharth Roy',
-        email: 'admin@kisansetu.in',
-        phone: '+91 98000 00000',
-        role: 'SUPER_ADMIN',
-        department: 'State Agricultural Marketing Directorate',
-        designation: 'Chief Procurement Director',
-        accountStatus: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-        twoFactorEnabled: true
-      },
-      {
-        adminId: 'ADM-2026-002',
-        fullName: 'Meenakshi Sharma',
-        email: 'meenakshi.s@kisansetu.in',
-        phone: '+91 98111 44555',
-        role: 'ADMIN',
-        department: 'Burdwan Zone APMC',
-        designation: 'Regional Mandi Administrator',
-        accountStatus: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-        twoFactorEnabled: false
-      },
-      {
-        adminId: 'ADM-2026-003',
-        fullName: 'Rajesh Mukherjee',
-        email: 'rajesh.m@kisansetu.in',
-        phone: '+91 98222 33444',
-        role: 'STAFF_MANAGER',
-        department: 'Field Operations & Inspection',
-        designation: 'Staff Roster Manager',
-        accountStatus: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 360).toISOString(),
-        twoFactorEnabled: true
-      }
-    ];
-
-    return res.json({ success: true, admins });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// 5. Toggle Admin Status / Unlock (SUPER_ADMIN only)
-export const toggleAdminStatus = async (req, res) => {
-  try {
-    const { targetAdminId, action } = req.body; // action: 'activate' | 'deactivate' | 'unlock'
-    
-    if (targetAdminId === 'ADM-2026-001' && action === 'deactivate') {
-      return res.status(400).json({ success: false, message: 'Action forbidden. The primary SUPER_ADMIN account cannot be deactivated.' });
-    }
-
-    await logAdminAudit(req.user?.adminId || 'SUPER_ADMIN', req.user?.role || 'SUPER_ADMIN', `ADMIN_${action.toUpperCase()}`, targetAdminId, `Admin status updated to ${action}`);
-
-    return res.json({ success: true, message: `Admin account ${targetAdminId} status updated to ${action}.` });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// 6. Active Sessions Controller
-export const getAdminSessions = async (req, res) => {
-  try {
-    const sessions = [
-      { sessionId: 'SESS-Current', device: 'Windows 11 Workstation', browser: 'Chrome 122', ipAddress: '127.0.0.1', loginTime: 'Today, 10:30 AM', isCurrent: true },
-      { sessionId: 'SESS-Mobile', device: 'Android Tablet (APMC Desk)', browser: 'Chrome Mobile', ipAddress: '192.168.1.45', loginTime: 'Yesterday, 04:15 PM', isCurrent: false }
-    ];
-    return res.json({ success: true, sessions });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to complete admin logout.',
+    });
   }
 };

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Sprout,
   Menu,
@@ -15,11 +15,12 @@ import {
   ChevronRight,
   ChevronDown,
   Wheat,
-} from 'lucide-react';
+  ShieldCheck,
+} from "lucide-react";
 
-import { useAuth } from '../../context/AuthContext';
-import { LanguageCode } from '../../types';
-// import NotificationBar from '././NotificationBar';
+import { useAuth } from "../../context/AuthContext";
+import { LanguageCode } from "../../types";
+
 export const Navbar: React.FC = () => {
   const {
     user,
@@ -43,19 +44,19 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  /* =========================
+  /* =========================================================
      LOGIN
-  ========================= */
+  ========================================================== */
 
   const handleLogin = () => {
     setMobileMenuOpen(false);
     setRoleDropdownOpen(false);
-    navigate('/login');
+    navigate("/login");
   };
 
-  /* =========================
+  /* =========================================================
      LOGOUT
-  ========================= */
+  ========================================================== */
 
   const handleLogout = () => {
     logout();
@@ -65,28 +66,28 @@ export const Navbar: React.FC = () => {
     setNotifDropdownOpen(false);
     setMobileMenuOpen(false);
 
-    navigate('/login');
+    navigate("/login");
   };
 
-  /* =========================
+  /* =========================================================
      SCROLL EFFECT
-  ========================= */
+  ========================================================== */
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  /* =========================
-     CLOSE DROPDOWNS ON ROUTE
-  ========================= */
+  /* =========================================================
+     CLOSE DROPDOWNS ON ROUTE CHANGE
+  ========================================================== */
 
   useEffect(() => {
     setRoleDropdownOpen(false);
@@ -95,15 +96,15 @@ export const Navbar: React.FC = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  /* =========================
+  /* =========================================================
      NOTIFICATIONS
-  ========================= */
+  ========================================================== */
 
   const unreadNotifs = notifications.filter((n) => !n.read);
 
-  /* =========================
+  /* =========================================================
      LANGUAGES
-  ========================= */
+  ========================================================== */
 
   const langNames: Record<
     LanguageCode,
@@ -113,117 +114,131 @@ export const Navbar: React.FC = () => {
     }
   > = {
     en: {
-      label: 'English',
-      flag: 'EN',
+      label: "English",
+      flag: "EN",
     },
     bn: {
-      label: 'বাংলা',
-      flag: 'বাং',
+      label: "বাংলা",
+      flag: "বাং",
     },
     hi: {
-      label: 'हिन्दी',
-      flag: 'हि',
+      label: "हिन्दी",
+      flag: "हि",
     },
   };
 
-  /* =========================
+  /* =========================================================
      NAVIGATION LINKS
-  ========================= */
+  ========================================================== */
 
-  const navLinks = [
+  const navLinks: {
+    name: string;
+    path: string;
+    highlight?: boolean;
+  }[] = [
     {
       name: t.navHome,
-      path: '/',
+      path: "/",
     },
     {
       name: t.navSchedule,
-      path: '/schedule',
+      path: "/schedule",
     },
     {
       name: t.navQueue,
-      path: '/queue',
+      path: "/queue",
     },
     {
       name: t.navStatus,
-      path: '/status',
+      path: "/status",
     },
     {
       name: t.navPayments,
-      path: '/payments',
+      path: "/payments",
     },
     {
-      name: 'Weather',
-      path: '/weather',
+      name: "Weather",
+      path: "/weather",
     },
     {
       name:
-        role === 'farmer'
-          ? 'Dashboard'
-          : role === 'officer'
-            ? t.navOfficerPortal
-            : t.navAdminPortal,
+        role === "farmer"
+          ? "Dashboard"
+          : role === "officer"
+          ? t.navOfficerPortal
+          : t.navAdminPortal,
       path:
-        role === 'farmer'
-          ? '/dashboard'
-          : role === 'officer'
-            ? '/officer'
-            : '/admin',
+        role === "farmer"
+          ? "/dashboard"
+          : role === "officer"
+          ? "/officer"
+          : "/admin",
     },
   ];
 
-  /* =========================
+  /* =========================================================
      ROLE LABEL
-  ========================= */
+  ========================================================== */
 
   const roleLabel =
-    role === 'farmer'
-      ? 'Farmer'
-      : role === 'officer'
-        ? 'Mandi Officer'
-        : 'Administrator';
+    role === "farmer"
+      ? "Farmer"
+      : role === "officer"
+      ? "Mandi Officer"
+      : "Administrator";
 
-  /* =========================
+  /* =========================================================
      ROLE ICON
-  ========================= */
+  ========================================================== */
 
   const RoleIcon = () => {
-    if (role === 'farmer') {
-      return <Sprout className="h-4 w-4" />;
+    if (role === "farmer") {
+      return <Sprout className="h-3.5 w-3.5" />;
     }
 
-    if (role === 'officer') {
-      return <Building2 className="h-4 w-4" />;
+    if (role === "officer") {
+      return <Building2 className="h-3.5 w-3.5" />;
     }
 
-    return <Crown className="h-4 w-4" />;
+    return <Crown className="h-3.5 w-3.5" />;
   };
 
   return (
     <>
       {/* =====================================================
-          NAVBAR
+          PREMIUM NAVBAR
       ====================================================== */}
 
       <header
         className={`
-          sticky top-0 z-50
-          w-full
-          border-b
+          sticky top-0 z-50 w-full
           transition-all duration-300
           ${
             isScrolled
-              ? 'border-slate-200/80 bg-white/95 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl'
-              : 'border-slate-200/60 bg-white'
+              ? "border-b border-emerald-900/10 bg-[#f8fbf8]/90 shadow-[0_8px_35px_rgba(6,78,59,0.10)] backdrop-blur-2xl"
+              : "border-b border-slate-200/70 bg-white/95 backdrop-blur-xl"
           }
         `}
       >
-        <div className="w-full">
+        {/* Very subtle top accent */}
+        <div
+          className="
+            absolute left-0 right-0 top-0 h-[2px]
+            bg-gradient-to-r
+            from-emerald-400
+            via-green-600
+            to-emerald-400
+          "
+        />
+
+        <div className="relative mx-auto w-full max-w-[1600px]">
           <div
-            className="
-              flex h-19 items-center
-              pl-3 pr-4 sm:pl-4 sm:pr-6 lg:pl-5 lg:pr-8
+            className={`
+              flex items-center
+              px-3 sm:px-5 lg:px-7
               transition-all duration-300
-            "
+              ${isScrolled ? "h-[68px]" : "h-[74px]"}
+            `}
           >
             {/* =================================================
                 LOGO
@@ -231,38 +246,43 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/"
-              className="group flex shrink-0 items-center gap-3"
+              className="group flex shrink-0 items-center gap-2.5"
               onClick={() => setMobileMenuOpen(false)}
             >
+              {/* Logo icon */}
               <div
                 className="
-                  relative flex h-11 w-11
+                  relative flex h-10 w-10
                   items-center justify-center
-                  overflow-hidden rounded-2xl
-                  bg-linear-to-br from-emerald-500 via-green-600 to-teal-700
-                  shadow-[0_8px_20px_rgba(16,185,129,0.28)]
+                  overflow-hidden rounded-xl
+                  bg-gradient-to-br
+                  from-emerald-500
+                  via-green-600
+                  to-teal-700
+                  shadow-[0_7px_20px_rgba(16,185,129,0.25)]
                   transition-all duration-300
-                  group-hover:scale-105
-                  group-hover:shadow-[0_10px_25px_rgba(16,185,129,0.38)]
+                  group-hover:-translate-y-0.5
+                  group-hover:shadow-[0_10px_28px_rgba(16,185,129,0.35)]
                 "
               >
-                <Sprout className="h-6 w-6 text-white" />
+                <Sprout className="h-5.5 w-5.5 text-white" />
 
-                <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent" />
               </div>
 
+              {/* Brand text */}
               <div className="hidden sm:block">
-                <div className="flex items-center gap-1">
-                  <span className="text-[18px] font-black tracking-[-0.04em] text-slate-900">
+                <div className="flex items-center gap-0.5">
+                  <span className="text-[17px] font-black tracking-[-0.045em] text-slate-900">
                     KISAN
                   </span>
 
-                  <span className="text-[18px] font-black tracking-[-0.04em] text-emerald-600">
+                  <span className="text-[17px] font-black tracking-[-0.045em] text-emerald-600">
                     SETU
                   </span>
                 </div>
 
-                <div className="-mt-0.5 text-[9px] font-semibold uppercase tracking-[0.19em] text-slate-400">
+                <div className="-mt-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400">
                   Smart Farmer Platform
                 </div>
               </div>
@@ -275,17 +295,18 @@ export const Navbar: React.FC = () => {
             <nav className="ml-5 hidden flex-1 items-center justify-center lg:flex">
               <div
                 className="
-                  flex items-center gap-1
+                  flex items-center gap-0.5
                   rounded-2xl
-                  border border-slate-200/70
-                  bg-slate-50/80
+                  border border-slate-200/80
+                  bg-slate-100/70
                   p-1
+                  shadow-inner
                 "
               >
                 {navLinks.map((link) => {
                   const isActive =
                     location.pathname === link.path ||
-                    (link.path !== '/' &&
+                    (link.path !== "/" &&
                       location.pathname.startsWith(link.path));
 
                   return (
@@ -296,14 +317,23 @@ export const Navbar: React.FC = () => {
                         group relative
                         flex items-center gap-1.5
                         rounded-xl
-                        px-3 py-2.5
-                        text-[13px]
+                        px-3 py-2
+                        text-[12px]
                         font-semibold
                         transition-all duration-200
                         ${
                           isActive
-                            ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200/70'
-                            : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
+                            ? `
+                              bg-white
+                              text-emerald-700
+                              shadow-[0_3px_12px_rgba(15,23,42,0.08)]
+                              ring-1 ring-slate-200/70
+                            `
+                            : `
+                              text-slate-500
+                              hover:bg-white/80
+                              hover:text-slate-900
+                            `
                         }
                       `}
                     >
@@ -313,8 +343,8 @@ export const Navbar: React.FC = () => {
                             h-3.5 w-3.5
                             ${
                               isActive
-                                ? 'text-emerald-500'
-                                : 'text-slate-400 group-hover:text-emerald-500'
+                                ? "text-emerald-500"
+                                : "text-slate-400 group-hover:text-emerald-500"
                             }
                           `}
                         />
@@ -323,7 +353,18 @@ export const Navbar: React.FC = () => {
                       <span>{link.name}</span>
 
                       {isActive && (
-                        <span className="absolute bottom-0.5 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-emerald-500" />
+                        <span
+                          className="
+                            absolute
+                            bottom-0.5
+                            left-1/2
+                            h-0.5
+                            w-5
+                            -translate-x-1/2
+                            rounded-full
+                            bg-emerald-500
+                          "
+                        />
                       )}
                     </Link>
                   );
@@ -335,10 +376,10 @@ export const Navbar: React.FC = () => {
                 RIGHT SIDE
             ================================================== */}
 
-            <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            <div className="ml-auto flex items-center gap-1.5">
 
               {/* =================================================
-                  ROLE / ACCOUNT DROPDOWN
+                  ROLE / PROFILE
               ================================================== */}
 
               {isAuthenticated && (
@@ -349,51 +390,56 @@ export const Navbar: React.FC = () => {
                       setLangDropdownOpen(false);
                       setNotifDropdownOpen(false);
                     }}
-                    className="
+                    className={`
                       group flex items-center gap-2
                       rounded-2xl
-                      border border-slate-200
-                      bg-white
-                      px-3 py-2
+                      border
+                      px-2.5 py-1.5
                       transition-all duration-200
-                      hover:border-emerald-200
-                      hover:bg-emerald-50/40
-                      hover:shadow-sm
-                    "
+                      ${
+                        roleDropdownOpen
+                          ? "border-emerald-200 bg-emerald-50/70 shadow-sm"
+                          : "border-slate-200/80 bg-white/80 hover:border-emerald-200 hover:bg-emerald-50/40"
+                      }
+                    `}
                   >
+                    {/* Avatar */}
                     <div
                       className="
-                        flex h-9 w-9 items-center justify-center
+                        flex h-8.5 w-8.5
+                        items-center justify-center
                         rounded-xl
-                        bg-linear-to-br
+                        bg-gradient-to-br
                         from-emerald-500
                         to-teal-600
-                        text-sm font-bold text-white
-                        shadow-sm
+                        text-xs font-black
+                        text-white
+                        shadow-[0_4px_12px_rgba(16,185,129,0.22)]
                       "
                     >
-                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
                     </div>
 
+                    {/* User information */}
                     <div className="hidden xl:block text-left">
-                      <p className="max-w-27.5 truncate text-[12px] font-bold text-slate-800">
-                        {user?.name || 'User'}
+                      <p className="max-w-[110px] truncate text-[11px] font-bold text-slate-800">
+                        {user?.name || "User"}
                       </p>
 
-                      {/* Current logged-in role */}
-                      <p className="text-[10px] font-medium text-slate-400">
+                      <div className="flex items-center gap-1 text-[9px] font-semibold text-emerald-600">
+                        <RoleIcon />
                         {roleLabel}
-                      </p>
+                      </div>
                     </div>
 
                     <ChevronDown
                       className={`
-                        h-4 w-4 text-slate-400
+                        h-3.5 w-3.5 text-slate-400
                         transition-transform duration-200
                         ${
                           roleDropdownOpen
-                            ? 'rotate-180 text-emerald-600'
-                            : ''
+                            ? "rotate-180 text-emerald-600"
+                            : ""
                         }
                       `}
                     />
@@ -404,62 +450,55 @@ export const Navbar: React.FC = () => {
                   ================================================== */}
 
                   {roleDropdownOpen && (
-                 <div className="
-    absolute right-0 top-[calc(100%+12px)]
-    w-82.5
-    max-h-[calc(100vh-90px)]
-    overflow-y-auto
-    overflow-x-hidden
-    rounded-3xl
-    border border-slate-200
-    bg-white
-    shadow-[0_20px_60px_rgba(15,23,42,0.14)]
-  "
->
+                    <div
+                      className="
+                        absolute right-0 top-[calc(100%+10px)]
+                        w-[330px]
+                        max-h-[calc(100vh-90px)]
+                        overflow-y-auto
+                        overflow-x-hidden
+                        rounded-3xl
+                        border border-slate-200/80
+                        bg-white/95
+                        shadow-[0_25px_70px_rgba(15,23,42,0.16)]
+                        backdrop-blur-2xl
+                      "
+                    >
                       {/* Profile Header */}
+                      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-green-900 to-teal-900 p-5 text-white">
+                        <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-400/10 blur-2xl" />
 
-                      <div className="bg-linear-to-br from-slate-50 to-white p-5">
-                        <div className="flex items-center gap-3">
+                        <div className="relative flex items-center gap-3">
                           <div
                             className="
                               flex h-12 w-12 shrink-0
                               items-center justify-center
                               rounded-2xl
-                              bg-linear-to-br
-                              from-emerald-500
-                              to-teal-600
-                              text-lg font-black text-white
-                              shadow-[0_8px_18px_rgba(16,185,129,0.25)]
+                              bg-gradient-to-br
+                              from-emerald-400
+                              to-teal-500
+                              text-lg font-black
+                              shadow-lg
                             "
                           >
-                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                            {user?.name?.charAt(0)?.toUpperCase() || "U"}
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-bold text-slate-900">
-                              {user?.name || 'User'}
+                            <p className="truncate text-sm font-bold">
+                              {user?.name || "User"}
                             </p>
 
-                            <p className="mt-0.5 truncate text-xs text-slate-500">
-                              {user?.village || 'Farmer Account'}
+                            <p className="mt-0.5 truncate text-[10px] text-emerald-100/70">
+                              {user?.village || "Farmer Account"}
                               {user?.district
                                 ? `, ${user.district}`
-                                : ''}
+                                : ""}
                             </p>
                           </div>
 
-                          <div
-                            className="
-                              rounded-full
-                              bg-linear-to-br from-emerald-50 to-emerald-100
-                              px-2.5 py-1
-                              text-[10px]
-                              font-bold
-                              uppercase
-                              tracking-wide
-                              text-emerald-700
-                            "
-                          >
+                          <div className="flex items-center gap-1 rounded-full border border-emerald-300/20 bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-emerald-200">
+                            <RoleIcon />
                             {roleLabel}
                           </div>
                         </div>
@@ -467,20 +506,21 @@ export const Navbar: React.FC = () => {
                         {user?.primaryCrop && (
                           <div
                             className="
-                              mt-4 flex items-center gap-2
+                              relative mt-4 flex items-center gap-2
                               rounded-xl
-                              border border-slate-200/80
-                              bg-linear-to-br from-white to-slate-100
+                              border border-white/10
+                              bg-white/10
                               px-3 py-2.5
+                              backdrop-blur-md
                             "
                           >
-                            <Wheat className="h-4 w-4 text-amber-500" />
+                            <Wheat className="h-4 w-4 text-amber-300" />
 
-                            <span className="text-[11px] font-medium text-slate-500">
+                            <span className="text-[10px] text-emerald-100/60">
                               Primary Crop
                             </span>
 
-                            <span className="ml-auto text-[11px] font-bold text-slate-800">
+                            <span className="ml-auto text-[10px] font-bold text-white">
                               {user.primaryCrop}
                             </span>
                           </div>
@@ -489,46 +529,39 @@ export const Navbar: React.FC = () => {
 
                       <div className="border-t border-slate-100" />
 
-                      {/* =================================================
-                          ROLE SWITCHER
-                      ================================================== */}
-
+                      {/* Role Switcher */}
                       <div className="p-3">
-                        <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400">
                           Switch Role
                         </p>
 
-                        {/* =================================================
-                            FARMER
-                        ================================================== */}
-
+                        {/* Farmer */}
                         <button
                           onClick={() => {
-                            switchRole('farmer');
+                            switchRole("farmer");
                             setRoleDropdownOpen(false);
-                            navigate('/dashboard');
+                            navigate("/dashboard");
                           }}
                           className={`
                             flex w-full items-center gap-3
                             rounded-2xl
-                            px-3 py-3
+                            px-3 py-2.5
                             text-left
                             transition-all
                             ${
-                              role === 'farmer'
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : 'text-slate-600 hover:bg-slate-50'
+                              role === "farmer"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "text-slate-600 hover:bg-slate-50"
                             }
                           `}
                         >
                           <div
                             className={`
-                              flex h-9 w-9 items-center justify-center
-                              rounded-xl
+                              flex h-9 w-9 items-center justify-center rounded-xl
                               ${
-                                role === 'farmer'
-                                  ? 'bg-emerald-100'
-                                  : 'bg-slate-100'
+                                role === "farmer"
+                                  ? "bg-emerald-100"
+                                  : "bg-slate-100"
                               }
                             `}
                           >
@@ -536,36 +569,28 @@ export const Navbar: React.FC = () => {
                           </div>
 
                           <div className="flex-1">
-                            <p className="text-xs font-bold">
-                              Farmer
-                            </p>
+                            <p className="text-xs font-bold">Farmer</p>
 
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[9px] text-slate-400">
                               Manage your farm
                             </p>
                           </div>
 
-                          {role === 'farmer' && (
+                          {role === "farmer" && (
                             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                           )}
                         </button>
 
-                        {/* =================================================
-                            MANDI OFFICER
-                            IMPORTANT:
-                            Farmer click করলে LOGIN PAGE আসবে.
-                            Farmer role change হবে না.
-                        ================================================== */}
-
+                        {/* Officer */}
                         <button
                           onClick={() => {
                             setRoleDropdownOpen(false);
-                            navigate('/login');
+                            navigate("/login");
                           }}
                           className="
                             mt-1 flex w-full items-center gap-3
                             rounded-2xl
-                            px-3 py-3
+                            px-3 py-2.5
                             text-left
                             text-slate-600
                             transition-all
@@ -573,13 +598,7 @@ export const Navbar: React.FC = () => {
                             hover:text-blue-700
                           "
                         >
-                          <div
-                            className="
-                              flex h-9 w-9 items-center justify-center
-                              rounded-xl
-                              bg-slate-100
-                            "
-                          >
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100">
                             <Building2 className="h-4 w-4" />
                           </div>
 
@@ -588,7 +607,7 @@ export const Navbar: React.FC = () => {
                               Mandi Officer
                             </p>
 
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[9px] text-slate-400">
                               Login required for officer access
                             </p>
                           </div>
@@ -596,22 +615,16 @@ export const Navbar: React.FC = () => {
                           <ChevronRight className="h-4 w-4 text-slate-300" />
                         </button>
 
-                        {/* =================================================
-                            ADMIN
-                            IMPORTANT:
-                            Farmer click করলে LOGIN PAGE আসবে.
-                            Farmer role change হবে না.
-                        ================================================== */}
-
+                        {/* Admin */}
                         <button
                           onClick={() => {
                             setRoleDropdownOpen(false);
-                            navigate('/login');
+                            navigate("/login");
                           }}
                           className="
                             mt-1 flex w-full items-center gap-3
                             rounded-2xl
-                            px-3 py-3
+                            px-3 py-2.5
                             text-left
                             text-slate-600
                             transition-all
@@ -619,13 +632,7 @@ export const Navbar: React.FC = () => {
                             hover:text-purple-700
                           "
                         >
-                          <div
-                            className="
-                              flex h-9 w-9 items-center justify-center
-                              rounded-xl
-                              bg-slate-100
-                            "
-                          >
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100">
                             <Crown className="h-4 w-4" />
                           </div>
 
@@ -634,7 +641,7 @@ export const Navbar: React.FC = () => {
                               Admin Console
                             </p>
 
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[9px] text-slate-400">
                               Login required for admin access
                             </p>
                           </div>
@@ -643,21 +650,16 @@ export const Navbar: React.FC = () => {
                         </button>
                       </div>
 
-                      {/* =================================================
-                          ACCOUNT ACTIONS
-                      ================================================== */}
-
+                      {/* Account Actions */}
                       <div className="border-t border-slate-100 p-3">
-
                         {/* Profile */}
-
                         <Link
                           to="/profile"
                           onClick={() => setRoleDropdownOpen(false)}
                           className="
                             flex items-center gap-3
                             rounded-2xl
-                            px-3 py-3
+                            px-3 py-2.5
                             text-slate-600
                             transition-colors
                             hover:bg-slate-50
@@ -669,11 +671,8 @@ export const Navbar: React.FC = () => {
                           </div>
 
                           <div className="flex-1">
-                            <p className="text-xs font-bold">
-                              Profile
-                            </p>
-
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-xs font-bold">Profile</p>
+                            <p className="text-[9px] text-slate-400">
                               View your account
                             </p>
                           </div>
@@ -681,15 +680,14 @@ export const Navbar: React.FC = () => {
                           <ChevronRight className="h-4 w-4 text-slate-300" />
                         </Link>
 
-                        {/* Register */}
-
+                        {/* Farm Registration */}
                         <Link
                           to="/register"
                           onClick={() => setRoleDropdownOpen(false)}
                           className="
                             mt-1 flex items-center gap-3
                             rounded-2xl
-                            px-3 py-3
+                            px-3 py-2.5
                             text-slate-600
                             transition-colors
                             hover:bg-slate-50
@@ -705,7 +703,7 @@ export const Navbar: React.FC = () => {
                               Register Farm & Crop Details
                             </p>
 
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[9px] text-slate-400">
                               Update your farm information
                             </p>
                           </div>
@@ -714,15 +712,14 @@ export const Navbar: React.FC = () => {
                         </Link>
 
                         {/* Logout */}
-
                         <button
                           onClick={handleLogout}
                           className="
                             mt-2 flex w-full items-center gap-3
                             rounded-2xl
                             border border-red-100
-                            bg-red-50/50
-                            px-3 py-3
+                            bg-red-50/60
+                            px-3 py-2.5
                             text-left
                             text-red-600
                             transition-all
@@ -739,7 +736,7 @@ export const Navbar: React.FC = () => {
                               Logout Account
                             </p>
 
-                            <p className="text-[10px] text-red-400">
+                            <p className="text-[9px] text-red-400">
                               Sign out securely
                             </p>
                           </div>
@@ -761,21 +758,22 @@ export const Navbar: React.FC = () => {
                     setRoleDropdownOpen(false);
                     setNotifDropdownOpen(false);
                   }}
-                  className="
+                  className={`
                     flex items-center gap-1.5
                     rounded-xl
-                    border border-transparent
+                    border
                     px-2.5 py-2
-                    text-slate-500
                     transition-all
-                    hover:border-slate-200
-                    hover:bg-slate-50
-                    hover:text-slate-800
-                  "
+                    ${
+                      langDropdownOpen
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border-transparent text-slate-500 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-800"
+                    }
+                  `}
                 >
                   <Globe className="h-4 w-4" />
 
-                  <span className="hidden xl:block text-[11px] font-bold">
+                  <span className="hidden xl:block text-[10px] font-bold">
                     {langNames[language].flag}
                   </span>
 
@@ -790,46 +788,45 @@ export const Navbar: React.FC = () => {
                       overflow-hidden
                       rounded-2xl
                       border border-slate-200
-                      bg-white
+                      bg-white/95
                       p-1.5
-                      shadow-[0_15px_45px_rgba(15,23,42,0.12)]
+                      shadow-[0_20px_55px_rgba(15,23,42,0.14)]
+                      backdrop-blur-xl
                     "
                   >
-                    {(Object.keys(langNames) as LanguageCode[]).map(
-                      (lang) => (
-                        <button
-                          key={lang}
-                          onClick={() => {
-                            setLanguage(lang);
-                            setLangDropdownOpen(false);
-                          }}
-                          className={`
-                            flex w-full items-center gap-3
-                            rounded-xl
-                            px-3 py-2.5
-                            text-left
-                            transition-colors
-                            ${
-                              language === lang
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : 'text-slate-600 hover:bg-slate-50'
-                            }
-                          `}
-                        >
-                          <span className="w-8 text-xs font-bold">
-                            {langNames[lang].flag}
-                          </span>
+                    {(Object.keys(langNames) as LanguageCode[]).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => {
+                          setLanguage(lang);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`
+                          flex w-full items-center gap-3
+                          rounded-xl
+                          px-3 py-2.5
+                          text-left
+                          transition-colors
+                          ${
+                            language === lang
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "text-slate-600 hover:bg-slate-50"
+                          }
+                        `}
+                      >
+                        <span className="w-8 text-xs font-bold">
+                          {langNames[lang].flag}
+                        </span>
 
-                          <span className="text-xs font-semibold">
-                            {langNames[lang].label}
-                          </span>
+                        <span className="text-xs font-semibold">
+                          {langNames[lang].label}
+                        </span>
 
-                          {language === lang && (
-                            <CheckCircle2 className="ml-auto h-4 w-4 text-emerald-500" />
-                          )}
-                        </button>
-                      )
-                    )}
+                        {language === lang && (
+                          <CheckCircle2 className="ml-auto h-4 w-4 text-emerald-500" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
@@ -846,42 +843,45 @@ export const Navbar: React.FC = () => {
                       setRoleDropdownOpen(false);
                       setLangDropdownOpen(false);
                     }}
-                    className="
+                    className={`
                       relative flex h-10 w-10
                       items-center justify-center
                       rounded-xl
-                      border border-transparent
-                      text-slate-500
+                      border
                       transition-all
-                      hover:border-slate-200
-                      hover:bg-slate-50
-                      hover:text-slate-800
-                    "
+                      ${
+                        notifDropdownOpen
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "border-transparent text-slate-500 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-800"
+                      }
+                    `}
                   >
-                    <Bell className="h-4.5 w-4.5" />
+                    <Bell className="h-[18px] w-[18px]" />
 
                     {unreadNotifs.length > 0 && (
                       <span
                         className="
-                          absolute right-1.5 top-1.5
+                          absolute right-1 top-1
                           flex h-4 min-w-4
                           items-center justify-center
                           rounded-full
                           border-2 border-white
-                          bg-red-500
+                          bg-emerald-500
                           px-0.5
-                          text-[8px]
+                          text-[7px]
                           font-black
                           text-white
+                          shadow-sm
                         "
                       >
                         {unreadNotifs.length > 9
-                          ? '9+'
+                          ? "9+"
                           : unreadNotifs.length}
                       </span>
                     )}
                   </button>
 
+                  {/* Notification Dropdown */}
                   {notifDropdownOpen && (
                     <div
                       className="
@@ -890,22 +890,27 @@ export const Navbar: React.FC = () => {
                         overflow-hidden
                         rounded-3xl
                         border border-slate-200
-                        bg-white
-                        shadow-[0_20px_60px_rgba(15,23,42,0.14)]
+                        bg-white/95
+                        shadow-[0_25px_70px_rgba(15,23,42,0.16)]
+                        backdrop-blur-xl
                       "
                     >
-                      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                        <div>
-                          <h3 className="text-sm font-bold text-slate-900">
-                            Notifications
-                          </h3>
+                      <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 to-white px-5 py-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900">
+                              Notifications
+                            </h3>
 
-                          <p className="mt-0.5 text-[10px] text-slate-400">
-                            {unreadNotifs.length} unread
-                          </p>
+                            <p className="mt-0.5 text-[10px] text-slate-400">
+                              {unreadNotifs.length} unread
+                            </p>
+                          </div>
+
+                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100">
+                            <Bell className="h-4 w-4 text-emerald-600" />
+                          </div>
                         </div>
-
-                        <Bell className="h-4 w-4 text-slate-400" />
                       </div>
 
                       <div className="max-h-80 overflow-y-auto">
@@ -927,14 +932,14 @@ export const Navbar: React.FC = () => {
                               className={`
                                 flex w-full gap-3
                                 border-b border-slate-50
-                                px-5 py-4
+                                px-5 py-3.5
                                 text-left
                                 transition-colors
                                 hover:bg-slate-50
                                 ${
                                   !notification.read
-                                    ? 'bg-emerald-50/30'
-                                    : ''
+                                    ? "bg-emerald-50/30"
+                                    : ""
                                 }
                               `}
                             >
@@ -945,8 +950,8 @@ export const Navbar: React.FC = () => {
                                   rounded-xl
                                   ${
                                     !notification.read
-                                      ? 'bg-emerald-100 text-emerald-600'
-                                      : 'bg-slate-100 text-slate-400'
+                                      ? "bg-emerald-100 text-emerald-600"
+                                      : "bg-slate-100 text-slate-400"
                                   }
                                 `}
                               >
@@ -959,8 +964,8 @@ export const Navbar: React.FC = () => {
                                     text-xs
                                     ${
                                       !notification.read
-                                        ? 'font-bold text-slate-800'
-                                        : 'font-medium text-slate-600'
+                                        ? "font-bold text-slate-800"
+                                        : "font-medium text-slate-600"
                                     }
                                   `}
                                 >
@@ -997,9 +1002,9 @@ export const Navbar: React.FC = () => {
                       items-center justify-center
                       rounded-xl
                       border border-slate-200
-                      bg-white
-                      px-4 py-2.5
-                      text-xs font-bold
+                      bg-white/80
+                      px-3.5 py-2.5
+                      text-[11px] font-bold
                       text-slate-700
                       transition-all
                       hover:border-emerald-200
@@ -1014,19 +1019,21 @@ export const Navbar: React.FC = () => {
                     to="/register"
                     className="
                       hidden md:inline-flex
-                      items-center gap-2
+                      items-center gap-1.5
                       rounded-xl
-                      bg-slate-900
-                      px-4 py-2.5
-                      text-xs font-bold
+                      bg-gradient-to-r
+                      from-emerald-600
+                      to-green-700
+                      px-3.5 py-2.5
+                      text-[11px] font-bold
                       text-white
-                      shadow-[0_6px_18px_rgba(15,23,42,0.15)]
+                      shadow-[0_6px_18px_rgba(16,185,129,0.20)]
                       transition-all
                       hover:-translate-y-0.5
-                      hover:bg-slate-800
+                      hover:shadow-[0_9px_24px_rgba(16,185,129,0.28)]
                     "
                   >
-                    <Sprout className="h-3.5 w-3.5 text-emerald-400" />
+                    <Sprout className="h-3.5 w-3.5" />
                     Get Started
                   </Link>
                 </>
@@ -1035,12 +1042,12 @@ export const Navbar: React.FC = () => {
                   onClick={handleLogout}
                   className="
                     hidden sm:inline-flex
-                    items-center gap-2
+                    items-center gap-1.5
                     rounded-xl
                     border border-red-100
-                    bg-red-50
-                    px-3.5 py-2.5
-                    text-xs font-bold
+                    bg-red-50/80
+                    px-3 py-2.5
+                    text-[11px] font-bold
                     text-red-600
                     transition-all
                     hover:border-red-200
@@ -1065,8 +1072,11 @@ export const Navbar: React.FC = () => {
                   border border-slate-200
                   bg-white
                   text-slate-700
+                  shadow-sm
                   transition-all
-                  hover:bg-slate-50
+                  hover:border-emerald-200
+                  hover:bg-emerald-50
+                  hover:text-emerald-700
                   lg:hidden
                 "
                 aria-label="Toggle menu"
@@ -1085,59 +1095,70 @@ export const Navbar: React.FC = () => {
           ====================================================== */}
 
           {mobileMenuOpen && (
-            <div className="border-t border-slate-100 bg-white lg:hidden">
-              <div className="max-h-[calc(100vh-76px)] overflow-y-auto px-4 py-4">
+            <div
+              className="
+                border-t border-emerald-900/10
+                bg-white/95
+                shadow-[0_20px_40px_rgba(15,23,42,0.08)]
+                backdrop-blur-2xl
+                lg:hidden
+              "
+            >
+              <div className="max-h-[calc(100vh-74px)] overflow-y-auto px-4 py-4">
 
-                {/* =================================================
-                    MOBILE USER
-                ================================================== */}
-
+                {/* Mobile User */}
                 {isAuthenticated && (
                   <div
                     className="
-                      mb-4
-                      rounded-3xl
-                      border border-slate-200
-                      bg-linear-to-br from-slate-50 to-white
+                      relative mb-4 overflow-hidden
+                      rounded-2xl
+                      bg-gradient-to-br
+                      from-emerald-950
+                      via-green-900
+                      to-teal-900
                       p-4
+                      text-white
                     "
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-400/10 blur-2xl" />
+
+                    <div className="relative flex items-center gap-3">
                       <div
                         className="
                           flex h-11 w-11
                           items-center justify-center
-                          rounded-2xl
-                          bg-linear-to-br from-emerald-500 to-teal-600
-                          text-sm font-black text-white
+                          rounded-xl
+                          bg-gradient-to-br
+                          from-emerald-400
+                          to-teal-500
+                          text-sm font-black
                         "
                       >
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-slate-900">
-                          {user?.name || 'User'}
+                        <p className="truncate text-sm font-bold">
+                          {user?.name || "User"}
                         </p>
 
-                        {/* Current logged-in role */}
-                        <p className="mt-0.5 text-[10px] font-medium text-emerald-600">
+                        <div className="mt-0.5 flex items-center gap-1 text-[9px] font-semibold text-emerald-200">
+                          <RoleIcon />
                           {roleLabel}
-                        </p>
+                        </div>
                       </div>
+
+                      <ShieldCheck className="h-5 w-5 text-emerald-300" />
                     </div>
                   </div>
                 )}
 
-                {/* =================================================
-                    MOBILE NAVIGATION
-                ================================================== */}
-
+                {/* Mobile Navigation */}
                 <nav className="space-y-1">
                   {navLinks.map((link) => {
                     const isActive =
                       location.pathname === link.path ||
-                      (link.path !== '/' &&
+                      (link.path !== "/" &&
                         location.pathname.startsWith(link.path));
 
                     return (
@@ -1147,27 +1168,27 @@ export const Navbar: React.FC = () => {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`
                           flex items-center gap-3
-                          rounded-2xl
-                          px-4 py-3.5
+                          rounded-xl
+                          px-4 py-3
                           text-sm font-semibold
                           transition-all
                           ${
                             isActive
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }
                         `}
                       >
                         {link.highlight ? (
-                          <Sparkles className="h-4 w-4" />
+                          <Sparkles className="h-4 w-4 text-emerald-500" />
                         ) : (
                           <span
                             className={`
                               h-1.5 w-1.5 rounded-full
                               ${
                                 isActive
-                                  ? 'bg-emerald-500'
-                                  : 'bg-slate-300'
+                                  ? "bg-emerald-500"
+                                  : "bg-slate-300"
                               }
                             `}
                           />
@@ -1183,13 +1204,10 @@ export const Navbar: React.FC = () => {
                   })}
                 </nav>
 
-                {/* =================================================
-                    MOBILE ACCOUNT ACTIONS
-                ================================================== */}
-
+                {/* Mobile Account */}
                 {isAuthenticated && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
-                    <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                    <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400">
                       Account
                     </p>
 
@@ -1198,8 +1216,8 @@ export const Navbar: React.FC = () => {
                       onClick={() => setMobileMenuOpen(false)}
                       className="
                         flex items-center gap-3
-                        rounded-2xl
-                        px-4 py-3.5
+                        rounded-xl
+                        px-4 py-3
                         text-sm font-semibold
                         text-slate-600
                         hover:bg-slate-50
@@ -1214,8 +1232,8 @@ export const Navbar: React.FC = () => {
                       onClick={() => setMobileMenuOpen(false)}
                       className="
                         flex items-center gap-3
-                        rounded-2xl
-                        px-4 py-3.5
+                        rounded-xl
+                        px-4 py-3
                         text-sm font-semibold
                         text-slate-600
                         hover:bg-slate-50
@@ -1227,61 +1245,51 @@ export const Navbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* =================================================
-                    MOBILE ROLE SWITCHER
-                ================================================== */}
-
+                {/* Mobile Role Switcher */}
                 {isAuthenticated && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
-                    <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                    <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400">
                       Switch Role
                     </p>
 
                     <div className="grid grid-cols-3 gap-2">
 
-                      {/* =================================================
-                          FARMER
-                      ================================================== */}
-
+                      {/* Farmer */}
                       <button
                         onClick={() => {
-                          switchRole('farmer');
+                          switchRole("farmer");
                           setMobileMenuOpen(false);
-                          navigate('/dashboard');
+                          navigate("/dashboard");
                         }}
                         className={`
                           flex flex-col items-center gap-2
-                          rounded-2xl
+                          rounded-xl
                           border
                           px-2 py-3
                           text-center
+                          transition-all
                           ${
-                            role === 'farmer'
-                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 bg-white text-slate-500'
+                            role === "farmer"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : "border-slate-200 bg-white text-slate-500"
                           }
                         `}
                       >
                         <Sprout className="h-4 w-4" />
-
                         <span className="text-[10px] font-bold">
                           Farmer
                         </span>
                       </button>
 
-                      {/* =================================================
-                          MANDI OFFICER
-                          LOGIN PAGE ONLY
-                      ================================================== */}
-
+                      {/* Officer */}
                       <button
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          navigate('/login');
+                          navigate("/login");
                         }}
                         className="
                           flex flex-col items-center gap-2
-                          rounded-2xl
+                          rounded-xl
                           border
                           border-slate-200
                           bg-white
@@ -1301,19 +1309,15 @@ export const Navbar: React.FC = () => {
                         </span>
                       </button>
 
-                      {/* =================================================
-                          ADMIN
-                          LOGIN PAGE ONLY
-                      ================================================== */}
-
+                      {/* Admin */}
                       <button
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          navigate('/login');
+                          navigate("/login");
                         }}
                         className="
                           flex flex-col items-center gap-2
-                          rounded-2xl
+                          rounded-xl
                           border
                           border-slate-200
                           bg-white
@@ -1336,20 +1340,17 @@ export const Navbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* =================================================
-                    MOBILE LOGIN / LOGOUT
-                ================================================== */}
-
+                {/* Mobile Login / Logout */}
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   {!isAuthenticated ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={handleLogin}
                         className="
-                          rounded-2xl
+                          rounded-xl
                           border border-slate-200
                           bg-white
-                          px-4 py-3.5
+                          px-4 py-3
                           text-sm font-bold
                           text-slate-700
                         "
@@ -1362,15 +1363,16 @@ export const Navbar: React.FC = () => {
                         onClick={() => setMobileMenuOpen(false)}
                         className="
                           flex items-center justify-center gap-2
-                          rounded-2xl
-                          bg-slate-900
-                          px-4 py-3.5
+                          rounded-xl
+                          bg-gradient-to-r
+                          from-emerald-600
+                          to-green-700
+                          px-4 py-3
                           text-sm font-bold
                           text-white
                         "
                       >
-                        <Sprout className="h-4 w-4 text-emerald-400" />
-
+                        <Sprout className="h-4 w-4" />
                         Get Started
                       </Link>
                     </div>
@@ -1380,47 +1382,43 @@ export const Navbar: React.FC = () => {
                       className="
                         flex w-full
                         items-center justify-center gap-2
-                        rounded-2xl
+                        rounded-xl
                         border border-red-100
                         bg-red-50
-                        px-4 py-3.5
+                        px-4 py-3
                         text-sm font-bold
                         text-red-600
                       "
                     >
                       <LogOut className="h-4 w-4" />
-
                       Logout Account
                     </button>
                   )}
                 </div>
 
-                {/* =================================================
-                    MOBILE LANGUAGE
-                ================================================== */}
-
+                {/* Mobile Language */}
                 <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4">
-                  {(Object.keys(langNames) as LanguageCode[]).map(
-                    (lang) => (
-                      <button
-                        key={lang}
-                        onClick={() => setLanguage(lang)}
-                        className={`
-                          flex-1 rounded-xl
-                          border px-3 py-2.5
-                          text-xs font-bold
-                          ${
-                            language === lang
-                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 text-slate-500'
-                          }
-                        `}
-                      >
-                        {langNames[lang].flag}
-                      </button>
-                    )
-                  )}
+                  {(Object.keys(langNames) as LanguageCode[]).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setLanguage(lang)}
+                      className={`
+                        flex-1 rounded-xl
+                        border px-3 py-2.5
+                        text-xs font-bold
+                        transition-all
+                        ${
+                          language === lang
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "border-slate-200 bg-white text-slate-500"
+                        }
+                      `}
+                    >
+                      {langNames[lang].flag}
+                    </button>
+                  ))}
                 </div>
+
               </div>
             </div>
           )}

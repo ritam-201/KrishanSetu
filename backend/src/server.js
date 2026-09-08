@@ -3,6 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 
 import { connectDB } from './config/db.js';
 import { initQueueSocket } from './sockets/queueSocket.js';
@@ -12,7 +13,7 @@ import {
   login,
   getFarmerProfile,
   bookToken,
-  getAuditLogs
+  getAuditLogs,
 } from './controllers/apiControllers.js';
 
 import {
@@ -21,8 +22,9 @@ import {
   logoutAdmin,
   changeAdminPassword,
   getAdminsList,
+  updateAdmin,
   toggleAdminStatus,
-  getAdminSessions
+  getAdminSessions,
 } from './controllers/adminAuthController.js';
 
 import {
@@ -31,12 +33,14 @@ import {
   getAdminCropBookings,
   getAdminPayments,
   getAdminQueue,
-  getAdminReports
+  getAdminReports,
 } from './controllers/adminController.js';
 
 import {
+  verifyToken,
+  requireRole,
   verifyAdminToken,
-  requireAdminRole
+  requireAdminRole,
 } from './middleware/auth.js';
 
 dotenv.config();
@@ -44,198 +48,154 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// =======================================================
-// MIDDLEWARE
-// =======================================================
+const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  })
-);
-
-app.use(express.json());
-
-// =======================================================
-// SOCKET.IO
-// =======================================================
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-  }
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  },
 });
 
-// =======================================================
-// DATABASE CONNECTION
-// =======================================================
+/* =========================================================
+   MIDDLEWARE
+========================================================= */
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+
+/* =========================================================
+   DATABASE
+========================================================= */
 
 connectDB()
-  .then(() => {
-    initializeSeedAdmins();
+  .then(async () => {
+    console.log('✅ MongoDB connected');
+
+    try {
+      await initializeSeedAdmins();
+      console.log('✅ Admin seed initialization completed');
+    } catch (error) {
+      console.error(
+        '⚠️ Admin seed initialization error:',
+        error.message
+      );
+    }
   })
   .catch((error) => {
-    console.error('❌ Database connection failed:', error);
+    console.error('❌ MongoDB connection failed:', error.message);
   });
 
-// =======================================================
-// SOCKET.IO QUEUE HANDLER
-// =======================================================
+/* =========================================================
+   BASIC ROUTES
+========================================================= */
 
-initQueueSocket(io);
-
-// =======================================================
-// HEALTH CHECK
-// =======================================================
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: '🚀 KisanSetu Backend API is running',
+  });
+});
 
 app.get('/api/health', (req, res) => {
   res.json({
-    status: 'ONLINE',
-    system: 'SmartFarm Procurement & Queue Management API',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// =======================================================
-// FARMER / GENERAL APIs
-// =======================================================
-
-app.post('/api/auth/login', login);
-
-app.get('/api/farmers/profile', getFarmerProfile);
-
-app.post('/api/tokens/book', bookToken);
-
-// =======================================================
-// ADMIN AUTHENTICATION APIs
-// =======================================================
-
-// Admin Login
-app.post('/api/admin/auth/login', loginAdmin);
-
-// Admin Registration
-app.post('/api/admin/auth/register', registerAdmin);
-
-// Registration Test
-app.get('/api/admin/auth/register-test', (req, res) => {
-  console.log('🔥 REGISTER TEST ROUTE HIT');
-
-  res.json({
     success: true,
-    message: 'Admin registration route is loaded'
+    message: 'KisanSetu API healthy',
+    timestamp: new Date().toISOString(),
   });
 });
 
-console.log('✅ Admin registration route loaded');
+/* =========================================================
+   FARMER AUTH / EXISTING API
+========================================================= */
 
-// Admin Logout
+app.post('/api/login', login);
+
+app.get(
+  '/api/farmer/profile',
+  verifyToken,
+  getFarmerProfile
+);
+
+app.post(
+  '/api/queue/book',
+  verifyToken,
+  bookToken
+);
+
+app.get(
+  '/api/audit-logs',
+  verifyToken,
+  getAuditLogs
+);
+
+/* =========================================================
+   ADMIN AUTH
+========================================================= */
+
+/*
+  Registration is intentionally public because a new admin
+  needs to be able to register before Super Admin approval.
+*/
+
+app.post(
+  '/api/admin/auth/register',
+  registerAdmin
+);
+
+app.post(
+  '/api/admin/auth/login',
+  loginAdmin
+);
+
 app.post(
   '/api/admin/auth/logout',
   verifyAdminToken,
   logoutAdmin
 );
 
-// Change Admin Password
 app.post(
   '/api/admin/auth/change-password',
   verifyAdminToken,
   changeAdminPassword
 );
 
-// =======================================================
-// ADMIN PORTAL DATA APIs
-// =======================================================
-//
-// These routes require a valid admin token.
-//
-// IMPORTANT:
-// We are NOT using requireAdminRole('ADMIN') here.
-// This allows authenticated admin users, including
-// SUPER_ADMIN, to access dashboard data.
-//
-// =======================================================
-
-// -------------------------------------------------------
-// ADMIN DASHBOARD
-// -------------------------------------------------------
-
 app.get(
-  '/api/admin/dashboard',
+  '/api/admin/auth/sessions',
   verifyAdminToken,
-  getAdminDashboard
+  getAdminSessions
 );
 
-// -------------------------------------------------------
-// ADMIN FARMERS
-// -------------------------------------------------------
+/* =========================================================
+   ADMIN MANAGEMENT
+   SUPER ADMIN ONLY
+========================================================= */
 
-app.get(
-  '/api/admin/farmers',
-  verifyAdminToken,
-  getAdminFarmers
-);
+/*
+  Get all registered admins
+*/
 
-// -------------------------------------------------------
-// ADMIN CROP BOOKINGS
-// -------------------------------------------------------
-
-app.get(
-  '/api/admin/crop-bookings',
-  verifyAdminToken,
-  getAdminCropBookings
-);
-
-// -------------------------------------------------------
-// ADMIN PAYMENTS
-// -------------------------------------------------------
-
-app.get(
-  '/api/admin/payments',
-  verifyAdminToken,
-  getAdminPayments
-);
-
-// -------------------------------------------------------
-// ADMIN QUEUE / TOKENS
-// -------------------------------------------------------
-
-app.get(
-  '/api/admin/queue',
-  verifyAdminToken,
-  getAdminQueue
-);
-
-// -------------------------------------------------------
-// ADMIN REPORTS
-// -------------------------------------------------------
-
-app.get(
-  '/api/admin/reports',
-  verifyAdminToken,
-  getAdminReports
-);
-
-// =======================================================
-// ADMIN AUDIT LOGS
-// =======================================================
-
-app.get(
-  '/api/admin/audit-logs',
-  verifyAdminToken,
-  getAuditLogs
-);
-
-// =======================================================
-// ADMIN MANAGEMENT
-// =======================================================
-//
-// Only SUPER_ADMIN can access these endpoints.
-// =======================================================
-
-// Get all admins
 app.get(
   '/api/admin/admins',
   verifyAdminToken,
@@ -243,7 +203,21 @@ app.get(
   getAdminsList
 );
 
-// Enable / Disable admin
+/*
+  Edit registered admin details
+*/
+
+app.put(
+  '/api/admin/admins/:adminId',
+  verifyAdminToken,
+  requireAdminRole('SUPER_ADMIN'),
+  updateAdmin
+);
+
+/*
+  Activate / Disable / Lock admin
+*/
+
 app.patch(
   '/api/admin/admins/status',
   verifyAdminToken,
@@ -251,28 +225,90 @@ app.patch(
   toggleAdminStatus
 );
 
-// Admin sessions
+/* =========================================================
+   ADMIN DASHBOARD
+========================================================= */
+
 app.get(
-  '/api/admin/sessions',
+  '/api/admin/dashboard',
   verifyAdminToken,
-  getAdminSessions
+  getAdminDashboard
 );
 
-// =======================================================
-// SERVER
-// =======================================================
+app.get(
+  '/api/admin/farmers',
+  verifyAdminToken,
+  getAdminFarmers
+);
 
-const PORT = process.env.PORT || 5000;
+app.get(
+  '/api/admin/crop-bookings',
+  verifyAdminToken,
+  getAdminCropBookings
+);
+
+app.get(
+  '/api/admin/payments',
+  verifyAdminToken,
+  getAdminPayments
+);
+
+app.get(
+  '/api/admin/queue',
+  verifyAdminToken,
+  getAdminQueue
+);
+
+app.get(
+  '/api/admin/reports',
+  verifyAdminToken,
+  getAdminReports
+);
+
+/* =========================================================
+   SOCKET.IO
+========================================================= */
+
+initQueueSocket(io);
+
+io.on('connection', (socket) => {
+  console.log(`🔌 Socket connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 Socket disconnected: ${socket.id}`);
+  });
+});
+
+/* =========================================================
+   404
+========================================================= */
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
+
+/* =========================================================
+   ERROR HANDLER
+========================================================= */
+
+app.use((error, req, res, next) => {
+  console.error('❌ Server error:', error);
+
+  res.status(error.status || 500).json({
+    success: false,
+    message: error.message || 'Internal server error.',
+  });
+});
+
+/* =========================================================
+   START SERVER
+========================================================= */
 
 server.listen(PORT, () => {
-  console.log('=======================================================');
-  console.log(` SmartFarm Procurement Backend API Server running on port ${PORT}`);
-  console.log(' Dedicated Admin Authentication & RBAC Active');
-  console.log(' Admin Dashboard APIs Connected');
-  console.log(' Farmers API Connected');
-  console.log(' Crop Bookings API Connected');
-  console.log(' Payments API Connected');
-  console.log(' Queue API Connected');
-  console.log(' Reports API Connected');
-  console.log('=======================================================');
+  console.log(
+    `🚀 KisanSetu backend running on http://localhost:${PORT}`
+  );
 });
