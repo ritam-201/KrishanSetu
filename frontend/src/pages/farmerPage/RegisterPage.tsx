@@ -851,7 +851,7 @@ const RegisterPage: React.FC = () => {
         className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10"
         style={{
           backgroundImage:
-            "linear-gradient(135deg, rgba(2,44,34,.94), rgba(6,78,59,.90)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=85')",
+            "linear-linear(135deg, rgba(2,44,34,.94), rgba(6,78,59,.90)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=85')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

@@ -40,7 +40,7 @@ const AdminRegisterPage: React.FC = () => {
   const [adminId, setAdminId] = useState("");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -58,34 +58,28 @@ const AdminRegisterPage: React.FC = () => {
       uppercase: /[A-Z]/.test(formData.password),
       lowercase: /[a-z]/.test(formData.password),
       number: /\d/.test(formData.password),
-      special: /[!@#$%^&*(),.?":{}|<>_\-\\[\]/;'`~+=]/.test(
-        formData.password
-      ),
+      special: /[!@#$%^&*(),.?":{}|<>_\-\\[\]/;'`~+=]/.test(formData.password),
     }),
-    [formData.password]
+    [formData.password],
   );
 
   const passwordScore = Object.values(passwordRules).filter(Boolean).length;
 
   const passwordStrength =
-    passwordScore <= 2
-      ? "Weak"
-      : passwordScore <= 4
-      ? "Medium"
-      : "Strong";
+    passwordScore <= 2 ? "Weak" : passwordScore <= 4 ? "Medium" : "Strong";
 
   const passwordStrengthWidth =
     passwordScore === 0
       ? "0%"
       : passwordScore === 1
-      ? "20%"
-      : passwordScore === 2
-      ? "40%"
-      : passwordScore === 3
-      ? "60%"
-      : passwordScore === 4
-      ? "80%"
-      : "100%";
+        ? "20%"
+        : passwordScore === 2
+          ? "40%"
+          : passwordScore === 3
+            ? "60%"
+            : passwordScore === 4
+              ? "80%"
+              : "100%";
 
   const validateForm = () => {
     if (!formData.fullName.trim()) {
@@ -122,7 +116,7 @@ const AdminRegisterPage: React.FC = () => {
 
     if (passwordScore < 3) {
       setError(
-        "Please create a stronger password using uppercase, lowercase, numbers or special characters."
+        "Please create a stronger password using uppercase, lowercase, numbers or special characters.",
       );
       return false;
     }
@@ -134,7 +128,7 @@ const AdminRegisterPage: React.FC = () => {
 
     if (!agreeTerms) {
       setError(
-        "Please confirm that you are authorized to create an administrator account."
+        "Please confirm that you are authorized to create an administrator account.",
       );
       return false;
     }
@@ -163,6 +157,9 @@ const AdminRegisterPage: React.FC = () => {
         body: JSON.stringify({
           fullName: formData.fullName.trim(),
           email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
+          department: formData.department,
+          designation: formData.designation,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
         }),
@@ -178,16 +175,14 @@ const AdminRegisterPage: React.FC = () => {
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message || "Unable to create administrator account."
+          data.message || "Unable to create administrator account.",
         );
       }
 
       const generatedAdminId = data.admin?.adminId || "";
 
       setAdminId(generatedAdminId);
-      setSuccess(
-        data.message || "Administrator account created successfully."
-      );
+      setSuccess(data.message || "Administrator account created successfully.");
 
       setFormData({
         fullName: "",
@@ -207,7 +202,7 @@ const AdminRegisterPage: React.FC = () => {
     } catch (err: any) {
       setError(
         err?.message ||
-          "Something went wrong while creating the administrator account."
+          "Something went wrong while creating the administrator account.",
       );
     } finally {
       setLoading(false);
@@ -225,7 +220,6 @@ const AdminRegisterPage: React.FC = () => {
 
         <div className="relative mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid w-full max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr]">
-
             {/* LEFT PANEL */}
             <div className="relative hidden overflow-hidden bg-linear-to-br from-emerald-700 via-emerald-800 to-teal-950 p-10 text-white lg:block">
               <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
@@ -260,9 +254,9 @@ const AdminRegisterPage: React.FC = () => {
                   </h2>
 
                   <p className="mt-5 max-w-md text-sm leading-7 text-emerald-50/80">
-                    Create an administrator account to securely manage
-                    farmers, mandis, procurement operations, bookings,
-                    payments and platform activities.
+                    Create an administrator account to securely manage farmers,
+                    mandis, procurement operations, bookings, payments and
+                    platform activities.
                   </p>
                 </div>
 
@@ -358,9 +352,7 @@ const AdminRegisterPage: React.FC = () => {
                         Registration successful
                       </p>
 
-                      <p className="mt-1 text-sm text-emerald-700">
-                        {success}
-                      </p>
+                      <p className="mt-1 text-sm text-emerald-700">{success}</p>
 
                       {adminId && (
                         <div className="mt-3 rounded-xl bg-white px-4 py-3">
@@ -518,9 +510,7 @@ const AdminRegisterPage: React.FC = () => {
                         onChange={handleChange}
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
                       >
-                        <option>
-                          State Agricultural Marketing Board
-                        </option>
+                        <option>State Agricultural Marketing Board</option>
                         <option>District Agriculture Department</option>
                         <option>Mandi Administration</option>
                         <option>Procurement Department</option>
@@ -601,9 +591,7 @@ const AdminRegisterPage: React.FC = () => {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                           aria-label={
-                            showPassword
-                              ? "Hide password"
-                              : "Show password"
+                            showPassword ? "Hide password" : "Show password"
                           }
                         >
                           {showPassword ? (
@@ -654,9 +642,7 @@ const AdminRegisterPage: React.FC = () => {
                         <input
                           id="confirmPassword"
                           name="confirmPassword"
-                          type={
-                            showConfirmPassword ? "text" : "password"
-                          }
+                          type={showConfirmPassword ? "text" : "password"}
                           value={formData.confirmPassword}
                           onChange={handleChange}
                           placeholder="Confirm your password"
@@ -733,9 +719,7 @@ const AdminRegisterPage: React.FC = () => {
 
                           <span
                             className={
-                              valid
-                                ? "text-emerald-700"
-                                : "text-slate-500"
+                              valid ? "text-emerald-700" : "text-slate-500"
                             }
                           >
                             {String(text)}
@@ -769,7 +753,7 @@ const AdminRegisterPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading || !!success}
-                  className="group flex w-full items-center justify-center gap-2 rounded-xl bg--to-r from-emerald-600 to-teal-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+                  className="group flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? (
                     <>

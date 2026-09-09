@@ -314,15 +314,15 @@ export const LoginPage: React.FC = () => {
 
       <div className="absolute inset-0 bg-[#06150c]/65" />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#04140b]/95 via-[#0a2917]/70 to-[#06150c]/45" />
+      <div className="absolute inset-0 bg-linear-to-r from-[#04140b]/95 via-[#0a2917]/70 to-[#06150c]/45" />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-[#04100a]/90 via-transparent to-[#06150c]/35" />
+      <div className="absolute inset-0 bg-linear-to-t from-[#04100a]/90 via-transparent to-[#06150c]/35" />
 
       {/* SOFT LIGHT */}
 
-      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-emerald-400/10 blur-[120px]" />
+      <div className="absolute -top-40 -right-40 w-150 h-150 rounded-full bg-emerald-400/10 blur-[120px]" />
 
-      <div className="absolute -bottom-40 -left-40 w-[550px] h-[550px] rounded-full bg-lime-300/10 blur-[120px]" />
+      <div className="absolute -bottom-40 -left-40 w-137.5 h-137.5 rounded-full bg-lime-300/10 blur-[120px]" />
 
       {/* ========================================================
           DECORATIVE AGRICULTURE ICONS
@@ -358,7 +358,7 @@ export const LoginPage: React.FC = () => {
 
                 <div className="absolute inset-0 rounded-2xl bg-emerald-400/40 blur-xl" />
 
-                <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-700 border border-white/20 flex items-center justify-center shadow-2xl">
+                <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-linear-to-br from-emerald-400 to-emerald-700 border border-white/20 flex items-center justify-center shadow-2xl">
 
                   <Sprout className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
 
@@ -538,11 +538,11 @@ export const LoginPage: React.FC = () => {
 
                 <div className="absolute -inset-2 bg-emerald-400/15 blur-3xl rounded-[40px]" />
 
-                <div className="relative rounded-[32px] bg-white/[0.94] backdrop-blur-2xl border border-white/70 shadow-[0_30px_100px_rgba(0,0,0,0.35)] overflow-hidden">
+                <div className="relative rounded-4xl bg-white/94 backdrop-blur-2xl border border-white/70 shadow-[0_30px_100px_rgba(0,0,0,0.35)] overflow-hidden">
 
                   {/* TOP ACCENT */}
 
-                  <div className="h-1.5 bg-gradient-to-r from-emerald-600 via-lime-400 to-emerald-500" />
+                  <div className="h-1.5 bg-linear-to-r from-emerald-600 via-lime-400 to-emerald-500" />
 
                   {/* =================================================
                       PANEL HEADER
@@ -593,7 +593,7 @@ export const LoginPage: React.FC = () => {
                         onClick={() => changePortal("farmer")}
                         className={`relative flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 rounded-xl text-[10px] sm:text-xs font-black transition-all duration-300 ${
                           activePortal === "farmer"
-                            ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-700/25 scale-[1.01]"
+                            ? "bg-linear-to-br from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-700/25 scale-[1.01]"
                             : "text-slate-500 hover:bg-white hover:text-slate-800"
                         }`}
                       >
@@ -615,7 +615,7 @@ export const LoginPage: React.FC = () => {
                         onClick={() => changePortal("government")}
                         className={`relative flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 rounded-xl text-[10px] sm:text-xs font-black transition-all duration-300 ${
                           activePortal === "government"
-                            ? "bg-gradient-to-br from-slate-800 to-slate-950 text-white shadow-lg shadow-slate-900/25 scale-[1.01]"
+                            ? "bg-linear-to-br from-slate-800 to-slate-950 text-white shadow-lg shadow-slate-900/25 scale-[1.01]"
                             : "text-slate-500 hover:bg-white hover:text-slate-800"
                         }`}
                       >
@@ -637,7 +637,7 @@ export const LoginPage: React.FC = () => {
                         onClick={() => changePortal("admin")}
                         className={`relative flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 rounded-xl text-[10px] sm:text-xs font-black transition-all duration-300 ${
                           activePortal === "admin"
-                            ? "bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-700/25 scale-[1.01]"
+                            ? "bg-linear-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-700/25 scale-[1.01]"
                             : "text-slate-500 hover:bg-white hover:text-slate-800"
                         }`}
                       >
@@ -671,7 +671,7 @@ export const LoginPage: React.FC = () => {
 
                         <div className="flex items-center gap-3 mb-6">
 
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-50 border border-emerald-200 flex items-center justify-center">
+                          <div className="w-11 h-11 rounded-2xl bg-linear-to-br from-emerald-100 to-green-50 border border-emerald-200 flex items-center justify-center">
 
                             <UserRound className="w-5 h-5 text-emerald-700" />
 
@@ -750,10 +750,10 @@ export const LoginPage: React.FC = () => {
                             <button
                               type="submit"
                               disabled={loading}
-                              className="group relative overflow-hidden w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-emerald-800/20 transition-all flex items-center justify-center gap-2"
+                              className="group relative overflow-hidden w-full py-4 rounded-2xl bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-emerald-800/20 transition-all flex items-center justify-center gap-2"
                             >
 
-                              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                              <span className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
 
                               {loading ? (
                                 <>
@@ -806,7 +806,7 @@ export const LoginPage: React.FC = () => {
                               <button
                                 type="submit"
                                 disabled={loading}
-                                className="group w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-emerald-800/20 transition-all flex items-center justify-center gap-2"
+                                className="group w-full py-4 rounded-2xl bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-emerald-800/20 transition-all flex items-center justify-center gap-2"
                               >
 
                                 {loading ? (
@@ -874,7 +874,7 @@ export const LoginPage: React.FC = () => {
 
                         </div>
 
-                        <div className="group border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-4 hover:border-emerald-300 transition-all">
+                        <div className="group border border-emerald-100 bg-linear-to-br from-emerald-50 to-white rounded-2xl p-4 hover:border-emerald-300 transition-all">
 
                           <div className="flex items-center justify-between gap-4">
 
@@ -1071,7 +1071,7 @@ export const LoginPage: React.FC = () => {
                           <button
                             type="submit"
                             disabled={loading}
-                            className="group w-full py-4 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-950 hover:from-slate-900 hover:to-black disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition-all flex items-center justify-center gap-2"
+                            className="group w-full py-4 rounded-2xl bg-linear-to-r from-slate-800 to-slate-950 hover:from-slate-900 hover:to-black disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition-all flex items-center justify-center gap-2"
                           >
 
                             {loading ? (
@@ -1134,7 +1134,7 @@ export const LoginPage: React.FC = () => {
 
                         <div className="flex items-center gap-3 mb-6">
 
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-100 to-fuchsia-50 border border-purple-200 flex items-center justify-center">
+                          <div className="w-11 h-11 rounded-2xl bg-linear-to-br from-purple-100 to-fuchsia-50 border border-purple-200 flex items-center justify-center">
 
                             <ShieldCheck className="w-5 h-5 text-purple-700" />
 
@@ -1281,7 +1281,7 @@ export const LoginPage: React.FC = () => {
                           <button
                             type="submit"
                             disabled={loading}
-                            className="group w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-purple-900/20 transition-all flex items-center justify-center gap-2"
+                            className="group w-full py-4 rounded-2xl bg-linear-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 disabled:opacity-50 text-white font-black text-sm shadow-xl shadow-purple-900/20 transition-all flex items-center justify-center gap-2"
                           >
 
                             {loading ? (
@@ -1321,7 +1321,7 @@ export const LoginPage: React.FC = () => {
 
                         </div>
 
-                        <div className="group border border-purple-100 bg-gradient-to-br from-purple-50 to-white rounded-2xl p-4 hover:border-purple-300 transition-all">
+                        <div className="group border border-purple-100 bg-linear-to-br from-purple-50 to-white rounded-2xl p-4 hover:border-purple-300 transition-all">
 
                           <div className="flex items-center justify-between gap-4">
 

@@ -223,8 +223,8 @@ export const Navbar: React.FC = () => {
         {/* Very subtle top accent */}
         <div
           className="
-            absolute left-0 right-0 top-0 h-[2px]
-            bg-gradient-to-r
+            absolute left-0 right-0 top-0 h-0.5
+            bg-linear-to-r
             from-emerald-400
             via-green-600
             to-emerald-400
@@ -237,7 +237,7 @@ export const Navbar: React.FC = () => {
               flex items-center
               px-3 sm:px-5 lg:px-7
               transition-all duration-300
-              ${isScrolled ? "h-[68px]" : "h-[74px]"}
+              ${isScrolled ? "h-17" : "h-18.5"}
             `}
           >
             {/* =================================================
@@ -255,7 +255,7 @@ export const Navbar: React.FC = () => {
                   relative flex h-10 w-10
                   items-center justify-center
                   overflow-hidden rounded-xl
-                  bg-gradient-to-br
+                  bg-linear-to-br
                   from-emerald-500
                   via-green-600
                   to-teal-700
@@ -267,7 +267,7 @@ export const Navbar: React.FC = () => {
               >
                 <Sprout className="h-5.5 w-5.5 text-white" />
 
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-tr from-white/10 to-transparent" />
               </div>
 
               {/* Brand text */}
@@ -409,7 +409,7 @@ export const Navbar: React.FC = () => {
                         flex h-8.5 w-8.5
                         items-center justify-center
                         rounded-xl
-                        bg-gradient-to-br
+                        bg-linear-to-br
                         from-emerald-500
                         to-teal-600
                         text-xs font-black
@@ -422,7 +422,7 @@ export const Navbar: React.FC = () => {
 
                     {/* User information */}
                     <div className="hidden xl:block text-left">
-                      <p className="max-w-[110px] truncate text-[11px] font-bold text-slate-800">
+                      <p className="max-w-27.5 truncate text-[11px] font-bold text-slate-800">
                         {user?.name || "User"}
                       </p>
 
@@ -453,7 +453,7 @@ export const Navbar: React.FC = () => {
                     <div
                       className="
                         absolute right-0 top-[calc(100%+10px)]
-                        w-[330px]
+                        w-82.5
                         max-h-[calc(100vh-90px)]
                         overflow-y-auto
                         overflow-x-hidden
@@ -465,7 +465,7 @@ export const Navbar: React.FC = () => {
                       "
                     >
                       {/* Profile Header */}
-                      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-green-900 to-teal-900 p-5 text-white">
+                      <div className="relative overflow-hidden bg-linear-to-br from-emerald-950 via-green-900 to-teal-900 p-5 text-white">
                         <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-400/10 blur-2xl" />
 
                         <div className="relative flex items-center gap-3">
@@ -474,7 +474,7 @@ export const Navbar: React.FC = () => {
                               flex h-12 w-12 shrink-0
                               items-center justify-center
                               rounded-2xl
-                              bg-gradient-to-br
+                              bg-linear-to-br
                               from-emerald-400
                               to-teal-500
                               text-lg font-black
@@ -856,7 +856,7 @@ export const Navbar: React.FC = () => {
                       }
                     `}
                   >
-                    <Bell className="h-[18px] w-[18px]" />
+                    <Bell className="h-4.5 w-4.5" />
 
                     {unreadNotifs.length > 0 && (
                       <span
@@ -895,7 +895,7 @@ export const Navbar: React.FC = () => {
                         backdrop-blur-xl
                       "
                     >
-                      <div className="border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 to-white px-5 py-4">
+                      <div className="border-b border-slate-100 bg-linear-to-r from-emerald-50/70 to-white px-5 py-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="text-sm font-bold text-slate-900">
@@ -1021,7 +1021,7 @@ export const Navbar: React.FC = () => {
                       hidden md:inline-flex
                       items-center gap-1.5
                       rounded-xl
-                      bg-gradient-to-r
+                      bg-linear-to-r
                       from-emerald-600
                       to-green-700
                       px-3.5 py-2.5
@@ -1112,7 +1112,7 @@ export const Navbar: React.FC = () => {
                     className="
                       relative mb-4 overflow-hidden
                       rounded-2xl
-                      bg-gradient-to-br
+                      bg-linear-to-br
                       from-emerald-950
                       via-green-900
                       to-teal-900
@@ -1128,7 +1128,7 @@ export const Navbar: React.FC = () => {
                           flex h-11 w-11
                           items-center justify-center
                           rounded-xl
-                          bg-gradient-to-br
+                          bg-linear-to-br
                           from-emerald-400
                           to-teal-500
                           text-sm font-black
@@ -1364,7 +1364,7 @@ export const Navbar: React.FC = () => {
                         className="
                           flex items-center justify-center gap-2
                           rounded-xl
-                          bg-gradient-to-r
+                          bg-linear-to-r
                           from-emerald-600
                           to-green-700
                           px-4 py-3

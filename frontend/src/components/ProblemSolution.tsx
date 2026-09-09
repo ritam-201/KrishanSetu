@@ -93,7 +93,7 @@ export const ProblemSolution: React.FC = () => {
                   hover:shadow-[0_18px_40px_rgba(16,185,129,0.12)]
                 "
               >
-                {/* Hover gradient */}
+                {/* Hover linear */}
                 <div
                   className="
                     absolute inset-x-0 top-0 h-1

@@ -39,7 +39,7 @@ export const Footer: React.FC = () => {
       />
 
       {/* Dark premium overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-green-950/92 to-slate-950/95" />
+      <div className="absolute inset-0 bg-linear-to-br from-emerald-950/95 via-green-950/92 to-slate-950/95" />
 
       {/* Soft glow */}
       <div className="absolute -left-24 -top-24 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
@@ -66,7 +66,7 @@ export const Footer: React.FC = () => {
                 flex h-11 w-11 shrink-0
                 items-center justify-center
                 rounded-xl
-                bg-gradient-to-br
+                bg-linear-to-br
                 from-emerald-400
                 via-green-500
                 to-teal-600

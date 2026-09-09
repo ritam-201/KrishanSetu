@@ -228,7 +228,7 @@ export const getAdminFarmers = async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| CROP BOOKINGS / PROCUREMENT
+| CROP BOOKINGS - GET
 |--------------------------------------------------------------------------
 */
 
@@ -296,6 +296,275 @@ export const getAdminCropBookings = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to load crop bookings',
+      error: error.message
+    });
+  }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| CROP BOOKINGS - CREATE
+|--------------------------------------------------------------------------
+*/
+
+export const createAdminCropBooking = async (req, res) => {
+  try {
+    const {
+      district,
+      block,
+      centerId,
+      farmerId,
+      crop,
+      variety,
+      quantityQuintals,
+      harvestDate
+    } = req.body;
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATION
+    |--------------------------------------------------------------------------
+    */
+
+    if (!district) {
+      return res.status(400).json({
+        success: false,
+        message: 'District is required'
+      });
+    }
+
+    if (!centerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mandi / procurement center is required'
+      });
+    }
+
+    if (!farmerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Farmer is required'
+      });
+    }
+
+    if (!crop) {
+      return res.status(400).json({
+        success: false,
+        message: 'Crop is required'
+      });
+    }
+
+    const quantity = Number(quantityQuintals);
+
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid quantity is required'
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CROP PROCUREMENT PRICES
+    |
+    | Project/demo procurement prices per quintal.
+    |--------------------------------------------------------------------------
+    */
+
+    const cropPrices = {
+      'Rice / Paddy': 2369,
+      'Wheat': 2425,
+      'Mustard': 5950,
+      'Maize': 2400,
+      'Bengal Gram (Chana)': 5650
+    };
+
+    const pricePerQuintal = cropPrices[crop];
+
+    if (!pricePerQuintal) {
+      return res.status(400).json({
+        success: false,
+        message: `Price not configured for crop: ${crop}`
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CALCULATE ESTIMATED AMOUNT
+    |--------------------------------------------------------------------------
+    */
+
+    const estimatedAmount = Number(
+      (quantity * pricePerQuintal).toFixed(2)
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | FIND FARMER
+    |--------------------------------------------------------------------------
+    */
+
+    const farmerProfile = await FarmerProfile.findOne({
+      farmerId: farmerId
+    }).lean();
+
+    if (!farmerProfile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Farmer profile not found'
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FIND CENTER
+    |
+    | We use the existing ProcurementCenter model if available.
+    |--------------------------------------------------------------------------
+    */
+
+    let centerName = centerId;
+
+    try {
+      const { ProcurementCenter } = await import(
+        '../models/ProcurementCenter.js'
+      );
+
+      const center = await ProcurementCenter.findOne({
+        $or: [
+          { id: centerId },
+          { _id: centerId }
+        ]
+      }).lean();
+
+      if (center) {
+        centerName = center.name || centerId;
+      }
+    } catch (centerError) {
+      console.warn(
+        '[Create Booking] Could not load ProcurementCenter:',
+        centerError.message
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GENERATE PROCUREMENT ID
+    |--------------------------------------------------------------------------
+    */
+
+    const bookingCount = await Procurement.countDocuments();
+
+    const procurementId =
+      `PROC-${new Date().getFullYear()}-${String(
+        bookingCount + 1
+      ).padStart(5, '0')}`;
+
+    /*
+    |--------------------------------------------------------------------------
+    | GENERATE TOKEN NUMBER
+    |--------------------------------------------------------------------------
+    */
+
+    const latestToken = await Procurement.findOne({
+      centerId
+    })
+      .sort({ tokenNumber: -1 })
+      .lean();
+
+    const tokenNumber =
+      latestToken && Number.isFinite(latestToken.tokenNumber)
+        ? latestToken.tokenNumber + 1
+        : 1;
+
+    /*
+    |--------------------------------------------------------------------------
+    | GENERATE LOT NUMBER
+    |--------------------------------------------------------------------------
+    */
+
+    const lotNumber =
+      `LOT-${new Date().getFullYear()}-${String(
+        bookingCount + 1
+      ).padStart(5, '0')}`;
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE PROCUREMENT
+    |--------------------------------------------------------------------------
+    */
+
+    const procurement = await Procurement.create({
+      procurementId,
+
+      tokenNumber,
+
+      farmerId: farmerProfile.farmerId,
+
+      farmerName: farmerProfile.fullName,
+
+      centerId,
+
+      centerName,
+
+      crop,
+
+      variety: variety || undefined,
+
+      submittedQuantityQuintals: quantity,
+
+      approvedQuantityQuintals: undefined,
+
+      rejectedQuantityQuintals: 0,
+
+      // PRICE INFORMATION
+      pricePerQuintal,
+
+      estimatedAmount,
+
+      harvestDate:
+        harvestDate ||
+        farmerProfile.crops?.find(
+          (item) => item.cropName === crop
+        )?.harvestDate,
+
+      lotNumber,
+
+      qualityGrade: 'Grade A',
+
+      status: 'Booked'
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESPONSE
+    |--------------------------------------------------------------------------
+    */
+
+    return res.status(201).json({
+      success: true,
+      message: 'Crop booking created successfully',
+
+      booking: procurement,
+
+      pricing: {
+        crop,
+        pricePerQuintal,
+        quantityQuintals: quantity,
+        estimatedAmount
+      }
+    });
+
+  } catch (error) {
+    console.error(
+      '[Admin Create Crop Booking Error]',
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create crop booking',
       error: error.message
     });
   }
@@ -638,7 +907,7 @@ export const getAdminReports = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: 'Failed to generate reports',
+      message: 'Failed to generate admin reports',
       error: error.message
     });
   }

@@ -136,7 +136,7 @@ export const FarmerProfilePage: React.FC = () => {
       )}
 
       {/* Profile Header Header Card */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+      <div className="bg-linear-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
@@ -214,7 +214,7 @@ export const FarmerProfilePage: React.FC = () => {
           </div>
           <div className="w-full bg-slate-950/40 rounded-full h-3 p-0.5 border border-white/10">
             <div
-              className="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500"
               style={{ width: `${profile.completionPercentage}%` }}
             />
           </div>

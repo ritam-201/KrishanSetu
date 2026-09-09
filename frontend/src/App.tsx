@@ -34,7 +34,7 @@ import RegisterPage from "./pages/farmerPage/RegisterPage";
 import { OfficerDashboard } from "./pages/adminPage/OfficerDashboard";
 
 // Admin Pages
-import { AdminDashboard } from "./pages/adminPage/AdminDashboard";
+import  AdminDashboard  from "./pages/adminPage/AdminDashboard";
 import { AdminLoginPage } from "./pages/adminPage/AdminLoginPage";
 import AdminRegisterPage from "./pages/adminPage/AdminRegisterPage";
 import { AdminProfilePage } from "./pages/adminPage/AdminProfilePage";

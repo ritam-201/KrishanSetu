@@ -1,9 +1,14 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
   paymentId: { type: String, required: true, unique: true, index: true },
   transactionId: { type: String, required: true, unique: true },
   pfmsReferenceNo: { type: String, required: true },
+  procurementId: {
+    type: String,
+    required: true,
+    index: true,
+  },
   farmerId: { type: String, required: true, index: true },
   farmerName: { type: String, required: true },
   tokenNumber: { type: Number, required: true },
@@ -16,8 +21,15 @@ const paymentSchema = new mongoose.Schema({
   netPayable: { type: Number, required: true },
   status: {
     type: String,
-    enum: ['Initiated', 'PFMS Verified', 'Treasury Cleared', 'Disbursed to Bank', 'On Hold', 'Failed'],
-    default: 'Initiated'
+    enum: [
+      "Initiated",
+      "PFMS Verified",
+      "Treasury Cleared",
+      "Disbursed to Bank",
+      "On Hold",
+      "Failed",
+    ],
+    default: "Initiated",
   },
   statusStageIndex: { type: Number, default: 1 }, // 0 to 4
   bankName: { type: String, required: true },
@@ -27,7 +39,8 @@ const paymentSchema = new mongoose.Schema({
   estimatedReleaseDate: { type: String },
   disbursedDate: { type: String },
   utrNumber: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
 });
 
-export const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
+export const Payment =
+  mongoose.models.Payment || mongoose.model("Payment", paymentSchema);

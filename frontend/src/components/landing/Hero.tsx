@@ -163,7 +163,7 @@ export const Hero: React.FC = () => {
           className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              "linear-gradient(#064e3b 1px, transparent 1px), linear-gradient(90deg, #064e3b 1px, transparent 1px)",
+              "linear-linear(#064e3b 1px, transparent 1px), linear-linear(90deg, #064e3b 1px, transparent 1px)",
             backgroundSize: "55px 55px",
           }}
         />

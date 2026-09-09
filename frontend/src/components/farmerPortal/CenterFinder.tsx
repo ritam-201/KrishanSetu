@@ -15,7 +15,7 @@ import {
   CircleDot,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { ProcurementCenter } from "../types";
+import { ProcurementCenter } from "../../types";
 
 export const CenterFinder: React.FC<{
   onSelectCenterForBooking?: (center: ProcurementCenter) => void;
@@ -252,7 +252,7 @@ export const CenterFinder: React.FC<{
                     className="absolute inset-0 opacity-40"
                     style={{
                       backgroundImage:
-                        "linear-gradient(#b9c9bd 1px, transparent 1px), linear-gradient(90deg, #b9c9bd 1px, transparent 1px)",
+                        "linear-linear(#b9c9bd 1px, transparent 1px), linear-linear(90deg, #b9c9bd 1px, transparent 1px)",
                       backgroundSize: "28px 28px",
                     }}
                   />
@@ -267,7 +267,7 @@ export const CenterFinder: React.FC<{
 
                   <div className="absolute left-0 top-1/2 h-px w-full rotate-12 bg-white/90" />
 
-                  <div className="absolute left-1/3 top-0 h-full w-px rotate-[22deg] bg-white/80" />
+                  <div className="absolute left-1/3 top-0 h-full w-px rotate-22 bg-white/80" />
 
                   <div className="absolute bottom-10 left-0 h-px w-full -rotate-6 bg-white/70" />
 
@@ -278,7 +278,7 @@ export const CenterFinder: React.FC<{
                     <div className="relative flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-slate-950 text-lg shadow-xl">
                       🚜
 
-                      <span className="absolute inset-[-9px] animate-ping rounded-full border border-emerald-500/30" />
+                      <span className="absolute -inset-2.25 animate-ping rounded-full border border-emerald-500/30" />
                     </div>
 
                     <span className="mt-2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1 text-[9px] font-bold text-white shadow-lg">
