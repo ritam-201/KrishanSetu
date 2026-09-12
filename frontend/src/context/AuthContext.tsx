@@ -651,18 +651,27 @@ interface AuthContextType {
 
   switchRole(newRole: UserRole): void;
 
-  loginWithProfile(
-    role: UserRole,
-    profileData?: Partial<UserProfile>,
-  ): void;
+  loginWithProfile(role: UserRole, profileData?: Partial<UserProfile>): void;
+  login(identifier: string): Promise<{
+    success: boolean;
+    user?: UserProfile;
+    message?: string;
+  }>;
+
+  verifyOTP(
+    identifier: string,
+    otp: string,
+  ): Promise<{
+    success: boolean;
+    user?: UserProfile;
+    message?: string;
+  }>;
 
   updateUserProfile(profileData: Partial<UserProfile>): void;
 
   registerUser(data: RegisterUserData): UserProfile;
 
-  getRegisteredUserByPhone(
-    phone: string,
-  ): UserProfile | undefined;
+  getRegisteredUserByPhone(phone: string): UserProfile | undefined;
 
   registeredUsers: UserProfile[];
 
@@ -704,10 +713,7 @@ interface AuthContextType {
     notes: string,
   ): void;
 
-  approveProcurementAndWeigh(
-    tokenNumber: number,
-    finalWeight: number,
-  ): void;
+  approveProcurementAndWeigh(tokenNumber: number, finalWeight: number): void;
 
   markNotificationRead(notificationId: string): void;
 
@@ -722,145 +728,100 @@ interface AuthContextType {
    CONTEXT
 ========================================================= */
 
-const AuthContext =
-  createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /* =========================================================
    PROVIDER
 ========================================================= */
 
-export const AuthProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   /* =======================================================
      USER
   ======================================================= */
 
-  const [user, setUser] =
-    useState<UserProfile | null>(() =>
-      loadStorage<UserProfile | null>(
-        STORAGE_KEYS.user,
-        null,
-      ),
-    );
+  const [user, setUser] = useState<UserProfile | null>(() =>
+    loadStorage<UserProfile | null>(STORAGE_KEYS.user, null),
+  );
 
   /* =======================================================
      ROLE
   ======================================================= */
 
-  const [role, setRole] =
-    useState<UserRole>(() =>
-      loadStorage<UserRole>(
-        STORAGE_KEYS.role,
-        "farmer",
-      ),
-    );
+  const [role, setRole] = useState<UserRole>(() =>
+    loadStorage<UserRole>(STORAGE_KEYS.role, "farmer"),
+  );
 
   /* =======================================================
      LANGUAGE
   ======================================================= */
 
-  const [language, setLanguageState] =
-    useState<"en" | "bn" | "hi">(() =>
-      loadStorage<"en" | "bn" | "hi">(
-        STORAGE_KEYS.language,
-        "en",
-      ),
-    );
+  const [language, setLanguageState] = useState<"en" | "bn" | "hi">(() =>
+    loadStorage<"en" | "bn" | "hi">(STORAGE_KEYS.language, "en"),
+  );
 
   /* =======================================================
      REGISTERED USERS
   ======================================================= */
 
-  const [registeredUsers, setRegisteredUsers] =
-    useState<UserProfile[]>(() =>
-      loadStorage<UserProfile[]>(
-        STORAGE_KEYS.registeredUsers,
-        [],
-      ),
-    );
+  const [registeredUsers, setRegisteredUsers] = useState<UserProfile[]>(() =>
+    loadStorage<UserProfile[]>(STORAGE_KEYS.registeredUsers, []),
+  );
 
   /* =======================================================
      CENTERS
   ======================================================= */
 
-  const [centers, setCenters] =
-    useState<ProcurementCenter[]>(() => {
-      const storedCenters =
-        loadFromStorage<ProcurementCenter[]>(
-          STORAGE_KEYS.centers,
-          [],
-        );
+  const [centers, setCenters] = useState<ProcurementCenter[]>(() => {
+    const storedCenters = loadFromStorage<ProcurementCenter[]>(
+      STORAGE_KEYS.centers,
+      [],
+    );
 
-      const existingCenters = [
-        ...INITIAL_CENTERS,
-        ...storedCenters,
-      ];
+    const existingCenters = [...INITIAL_CENTERS, ...storedCenters];
 
-      const existingIds = new Set(
-        existingCenters.map(
-          (center) => center.id,
-        ),
-      );
+    const existingIds = new Set(existingCenters.map((center) => center.id));
 
-      const additionalMandis =
-        WEST_BENGAL_MANDIS.filter(
-          (center) =>
-            !existingIds.has(center.id),
-        );
+    const additionalMandis = WEST_BENGAL_MANDIS.filter(
+      (center) => !existingIds.has(center.id),
+    );
 
-      return [
-        ...existingCenters,
-        ...additionalMandis,
-      ];
-    });
+    return [...existingCenters, ...additionalMandis];
+  });
 
   /* =======================================================
      SLOTS
   ======================================================= */
 
-  const [slots, setSlots] =
-    useState<ProcurementSlot[]>(() =>
-      loadStorage<ProcurementSlot[]>(
-        STORAGE_KEYS.slots,
-        INITIAL_SLOTS,
-      ),
-    );
+  const [slots, setSlots] = useState<ProcurementSlot[]>(() =>
+    loadStorage<ProcurementSlot[]>(STORAGE_KEYS.slots, INITIAL_SLOTS),
+  );
 
   /* =======================================================
      QUEUE TOKENS
   ======================================================= */
 
-  const [queueTokens, setQueueTokens] =
-    useState<QueueToken[]>(() =>
-      loadStorage<QueueToken[]>(
-        STORAGE_KEYS.queueTokens,
-        INITIAL_QUEUE_TOKENS,
-      ),
-    );
+  const [queueTokens, setQueueTokens] = useState<QueueToken[]>(() =>
+    loadStorage<QueueToken[]>(STORAGE_KEYS.queueTokens, INITIAL_QUEUE_TOKENS),
+  );
 
   /* =======================================================
      QUALITY REPORT
   ======================================================= */
 
-  const [qualityReport, setQualityReport] =
-    useState<QualityReport>(
-      INITIAL_QUALITY_REPORT,
-    );
+  const [qualityReport, setQualityReport] = useState<QualityReport>(
+    INITIAL_QUALITY_REPORT,
+  );
 
   /* =======================================================
      MILESTONES
   ======================================================= */
 
-  const [milestones, setMilestones] =
-    useState<VerificationMilestone[]>(() =>
-      loadStorage<VerificationMilestone[]>(
-        STORAGE_KEYS.milestones,
-        INITIAL_VERIFICATION_MILESTONES,
-      ),
-    );
+  const [milestones, setMilestones] = useState<VerificationMilestone[]>(() =>
+    loadStorage<VerificationMilestone[]>(
+      STORAGE_KEYS.milestones,
+      INITIAL_VERIFICATION_MILESTONES,
+    ),
+  );
 
   /* =======================================================
      PAYMENTS
@@ -871,37 +832,31 @@ export const AuthProvider = ({
      SBI / ₹55,000 from automatically appearing.
   ======================================================= */
 
-  const [payments, setPayments] =
-    useState<PaymentTransaction[]>(() =>
-      loadStorage<PaymentTransaction[]>(
-        STORAGE_KEYS.payments,
-        [],
-      ),
-    );
+  const [payments, setPayments] = useState<PaymentTransaction[]>(() =>
+    loadStorage<PaymentTransaction[]>(STORAGE_KEYS.payments, []),
+  );
 
   /* =======================================================
      NOTIFICATIONS
   ======================================================= */
 
-  const [notifications, setNotifications] =
-    useState<AppNotification[]>(() =>
-      loadStorage<AppNotification[]>(
-        STORAGE_KEYS.notifications,
-        INITIAL_NOTIFICATIONS,
-      ),
-    );
+  const [notifications, setNotifications] = useState<AppNotification[]>(() =>
+    loadStorage<AppNotification[]>(
+      STORAGE_KEYS.notifications,
+      INITIAL_NOTIFICATIONS,
+    ),
+  );
 
   /* =======================================================
      CURRENT CENTER
   ======================================================= */
 
-  const [currentCenterId, setCurrentCenterIdState] =
-    useState<string>(() =>
-      loadStorage<string>(
-        STORAGE_KEYS.currentCenter,
-        INITIAL_CENTERS[0]?.id || "",
-      ),
-    );
+  const [currentCenterId, setCurrentCenterIdState] = useState<string>(() =>
+    loadStorage<string>(
+      STORAGE_KEYS.currentCenter,
+      INITIAL_CENTERS[0]?.id || "",
+    ),
+  );
 
   /* =======================================================
      TRANSLATION
@@ -909,24 +864,17 @@ export const AuthProvider = ({
 
   const t = createTranslation(language);
 
-  const setLanguage = (
-    newLanguage: "en" | "bn" | "hi",
-  ): void => {
+  const setLanguage = (newLanguage: "en" | "bn" | "hi"): void => {
     setLanguageState(newLanguage);
 
-    saveStorage(
-      STORAGE_KEYS.language,
-      newLanguage,
-    );
+    saveStorage(STORAGE_KEYS.language, newLanguage);
   };
 
   /* =========================================================
      REGISTER USER
   ========================================================= */
 
-  const registerUser = (
-    data: RegisterUserData,
-  ): UserProfile => {
+  const registerUser = (data: RegisterUserData): UserProfile => {
     const {
       role: newRole,
       name,
@@ -967,32 +915,21 @@ export const AuthProvider = ({
       bankName,
       bankAccountLast4,
       ifscCode,
-      detailedProfile:
-        suppliedDetailedProfile,
+      detailedProfile: suppliedDetailedProfile,
     } = data;
 
     const baseProfile =
-      INITIAL_USER_PROFILES[newRole] ||
-      INITIAL_USER_PROFILES.farmer;
+      INITIAL_USER_PROFILES[newRole] || INITIAL_USER_PROFILES.farmer;
 
-    const cleanPhone =
-      phone?.trim() ||
-      baseProfile.phone ||
-      "";
+    const cleanPhone = phone?.trim() || baseProfile.phone || "";
 
-    const existingProfile =
-      registeredUsers.find(
-        (registeredUser) =>
-          registeredUser.phone === cleanPhone,
-      );
+    const existingProfile = registeredUsers.find(
+      (registeredUser) => registeredUser.phone === cleanPhone,
+    );
 
     const generatedId =
       existingProfile?.id ||
-      `${
-        newRole === "farmer"
-          ? "FARM"
-          : "USER"
-      }-${Date.now()
+      `${newRole === "farmer" ? "FARM" : "USER"}-${Date.now()
         .toString()
         .slice(-6)}`;
 
@@ -1003,9 +940,7 @@ export const AuthProvider = ({
       "KisanSetu User";
 
     const cleanAadhaar =
-      aadhaarNumber
-        ?.replace(/\s+/g, "")
-        .trim() ||
+      aadhaarNumber?.replace(/\s+/g, "").trim() ||
       existingProfile?.aadhaarNumber ||
       "";
 
@@ -1016,16 +951,10 @@ export const AuthProvider = ({
       "Rice / Paddy";
 
     const cleanLandAcres =
-      Number(
-        landAcres ??
-          totalLandArea ??
-          existingProfile?.landAcres,
-      ) || 0;
+      Number(landAcres ?? totalLandArea ?? existingProfile?.landAcres) || 0;
 
     const cleanAccountLast4 =
-      bankAccountLast4
-        ?.replace(/\D/g, "")
-        .slice(-4) ||
+      bankAccountLast4?.replace(/\D/g, "").slice(-4) ||
       existingProfile?.bankAccountLast4 ||
       baseProfile.bankAccountLast4 ||
       "";
@@ -1037,21 +966,12 @@ export const AuthProvider = ({
       "";
 
     const cleanEmail =
-      email?.trim() ||
-      existingProfile?.email ||
-      baseProfile.email ||
-      "";
+      email?.trim() || existingProfile?.email || baseProfile.email || "";
 
     const cleanVillage =
-      village?.trim() ||
-      existingProfile?.village ||
-      baseProfile.village ||
-      "";
+      village?.trim() || existingProfile?.village || baseProfile.village || "";
 
-    const cleanBlock =
-      block?.trim() ||
-      existingProfile?.block ||
-      "";
+    const cleanBlock = block?.trim() || existingProfile?.block || "";
 
     const cleanDistrict =
       district?.trim() ||
@@ -1059,47 +979,32 @@ export const AuthProvider = ({
       baseProfile.district ||
       "";
 
-    const cleanState =
-      state?.trim() ||
-      existingProfile?.state ||
-      "West Bengal";
+    const cleanState = state?.trim() || existingProfile?.state || "West Bengal";
 
-    const cleanPinCode =
-      pinCode?.trim() ||
-      existingProfile?.pinCode ||
-      "";
+    const cleanPinCode = pinCode?.trim() || existingProfile?.pinCode || "";
 
     const cleanFarmerId =
       farmerId?.trim() ||
-      existingProfile?.detailedProfile
-        ?.farmerId ||
+      existingProfile?.detailedProfile?.farmerId ||
       generatedId;
 
     const cleanRegistrationNumber =
       farmerRegistrationNumber?.trim() ||
-      existingProfile?.detailedProfile
-        ?.farmerRegistrationNumber ||
-      `KS-${new Date().getFullYear()}-${cleanFarmerId.replace(
-        /\W/g,
-        "",
-      )}`;
+      existingProfile?.detailedProfile?.farmerRegistrationNumber ||
+      `KS-${new Date().getFullYear()}-${cleanFarmerId.replace(/\W/g, "")}`;
 
     const normalizedAadhaarLast4 =
       cleanAadhaar.length >= 4
         ? cleanAadhaar.slice(-4)
-        : existingProfile?.aadhaarLast4 ||
-          "";
+        : existingProfile?.aadhaarLast4 || "";
 
     const normalizedMaskedGovtId =
       maskedGovtId?.trim() ||
       (normalizedAadhaarLast4
         ? `XXXX XXXX ${normalizedAadhaarLast4}`
-        : existingProfile?.detailedProfile
-            ?.maskedGovtId || "");
+        : existingProfile?.detailedProfile?.maskedGovtId || "");
 
-    const existingCrops =
-      existingProfile?.detailedProfile
-        ?.crops || [];
+    const existingCrops = existingProfile?.detailedProfile?.crops || [];
 
     const normalizedCrops: CropDetail[] =
       crops && crops.length > 0
@@ -1110,24 +1015,15 @@ export const AuthProvider = ({
               {
                 id: `CROP-${Date.now()}`,
                 cropName: cleanPrimaryCrop,
-                variety:
-                  cropVariety?.trim() || "",
-                season:
-                  cropSeason || "Kharif",
-                expectedQuantityQuintals:
-                  Number(
-                    expectedQuantityQuintals,
-                  ) || 0,
-                harvestDate:
-                  harvestDate || "",
-                expectedProcurementDate:
-                  expectedProcurementDate ||
-                  "",
+                variety: cropVariety?.trim() || "",
+                season: cropSeason || "Kharif",
+                expectedQuantityQuintals: Number(expectedQuantityQuintals) || 0,
+                harvestDate: harvestDate || "",
+                expectedProcurementDate: expectedProcurementDate || "",
               },
             ];
 
-    const existingDetailed =
-      existingProfile?.detailedProfile;
+    const existingDetailed = existingProfile?.detailedProfile;
 
     const detailed: DetailedFarmerProfile = {
       ...(existingDetailed || {}),
@@ -1138,29 +1034,18 @@ export const AuthProvider = ({
 
       fullName: cleanName,
 
-      dob:
-        dob ||
-        existingDetailed?.dob ||
-        "",
+      dob: dob || existingDetailed?.dob || "",
 
-      gender:
-        gender ||
-        existingDetailed?.gender ||
-        "Male",
+      gender: gender || existingDetailed?.gender || "Male",
 
       preferredLanguage:
-        preferredLanguage ||
-        existingDetailed?.preferredLanguage ||
-        language,
+        preferredLanguage || existingDetailed?.preferredLanguage || language,
 
       mobileNumber: cleanPhone,
 
       email: cleanEmail,
 
-      addressLine:
-        addressLine?.trim() ||
-        existingDetailed?.addressLine ||
-        "",
+      addressLine: addressLine?.trim() || existingDetailed?.addressLine || "",
 
       village: cleanVillage,
 
@@ -1172,62 +1057,36 @@ export const AuthProvider = ({
 
       pinCode: cleanPinCode,
 
-      govtIdType:
-        govtIdType ||
-        existingDetailed?.govtIdType ||
-        "Aadhaar Card",
+      govtIdType: govtIdType || existingDetailed?.govtIdType || "Aadhaar Card",
 
-      maskedGovtId:
-        normalizedMaskedGovtId,
+      maskedGovtId: normalizedMaskedGovtId,
 
-      farmerRegistrationNumber:
-        cleanRegistrationNumber,
+      farmerRegistrationNumber: cleanRegistrationNumber,
 
       verificationStatus:
-        existingDetailed?.verificationStatus ||
-        "Pending Verification",
+        existingDetailed?.verificationStatus || "Pending Verification",
 
-      verificationDate:
-        existingDetailed?.verificationDate ||
-        "",
+      verificationDate: existingDetailed?.verificationDate || "",
 
       farmName:
-        farmName?.trim() ||
-        existingDetailed?.farmName ||
-        `${cleanName}'s Farm`,
+        farmName?.trim() || existingDetailed?.farmName || `${cleanName}'s Farm`,
 
       farmLocation:
         farmLocation?.trim() ||
         existingDetailed?.farmLocation ||
-        [
-          cleanVillage,
-          cleanBlock,
-          cleanDistrict,
-        ]
-          .filter(Boolean)
-          .join(", "),
+        [cleanVillage, cleanBlock, cleanDistrict].filter(Boolean).join(", "),
 
       totalLandArea: cleanLandAcres,
 
-      landUnit:
-        landUnit ||
-        existingDetailed?.landUnit ||
-        "Acres",
+      landUnit: landUnit || existingDetailed?.landUnit || "Acres",
 
       ownershipType:
-        ownershipType ||
-        existingDetailed?.ownershipType ||
-        "Owned",
+        ownershipType || existingDetailed?.ownershipType || "Owned",
 
       irrigationAvailable:
-        irrigationAvailable ??
-        existingDetailed?.irrigationAvailable ??
-        false,
+        irrigationAvailable ?? existingDetailed?.irrigationAvailable ?? false,
 
-      soilType:
-        soilType?.trim() ||
-        existingDetailed?.soilType ||
-        "",
+      soilType: soilType?.trim() || existingDetailed?.soilType || "",
 
       crops: normalizedCrops,
 
@@ -1239,9 +1098,7 @@ export const AuthProvider = ({
         "",
 
       preferredTimeSlot:
-        preferredTimeSlot ||
-        existingDetailed?.preferredTimeSlot ||
-        "",
+        preferredTimeSlot || existingDetailed?.preferredTimeSlot || "",
 
       preferredNotificationMethod:
         preferredNotificationMethod ||
@@ -1260,9 +1117,7 @@ export const AuthProvider = ({
       cleanBlock,
       cleanDistrict,
       cleanPinCode,
-      cleanLandAcres > 0
-        ? cleanLandAcres
-        : "",
+      cleanLandAcres > 0 ? cleanLandAcres : "",
       cleanBankName,
       cleanAccountLast4,
       detailed.farmName,
@@ -1270,13 +1125,9 @@ export const AuthProvider = ({
       detailed.preferredTimeSlot,
     ];
 
-    detailed.completionPercentage =
-      Math.round(
-        (profileFields.filter(Boolean)
-          .length /
-          profileFields.length) *
-          100,
-      );
+    detailed.completionPercentage = Math.round(
+      (profileFields.filter(Boolean).length / profileFields.length) * 100,
+    );
 
     const newProfile: UserProfile = {
       ...baseProfile,
@@ -1295,8 +1146,7 @@ export const AuthProvider = ({
 
       aadhaarNumber: cleanAadhaar,
 
-      aadhaarLast4:
-        normalizedAadhaarLast4,
+      aadhaarLast4: normalizedAadhaarLast4,
 
       primaryCrop: cleanPrimaryCrop,
 
@@ -1314,13 +1164,9 @@ export const AuthProvider = ({
 
       bankName: cleanBankName,
 
-      bankAccountLast4:
-        cleanAccountLast4,
+      bankAccountLast4: cleanAccountLast4,
 
-      ifscCode:
-        ifscCode?.trim() ||
-        existingProfile?.ifscCode ||
-        "",
+      ifscCode: ifscCode?.trim() || existingProfile?.ifscCode || "",
 
       assignedCenterId:
         preferredCenterId ||
@@ -1334,8 +1180,7 @@ export const AuthProvider = ({
             (preferredCenterId ||
               existingProfile?.assignedCenterId ||
               detailed.preferredCenterId),
-        )?.name ||
-        existingProfile?.assignedCenterName,
+        )?.name || existingProfile?.assignedCenterName,
 
       detailedProfile: detailed,
     };
@@ -1344,19 +1189,14 @@ export const AuthProvider = ({
       const updated = [
         ...previous.filter(
           (registeredUser) =>
-            registeredUser.phone !==
-              newProfile.phone &&
-            registeredUser.id !==
-              newProfile.id,
+            registeredUser.phone !== newProfile.phone &&
+            registeredUser.id !== newProfile.id,
         ),
 
         newProfile,
       ];
 
-      saveStorage(
-        STORAGE_KEYS.registeredUsers,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.registeredUsers, updated);
 
       return updated;
     });
@@ -1365,33 +1205,121 @@ export const AuthProvider = ({
 
     setRole(newRole);
 
-    saveStorage(
-      STORAGE_KEYS.user,
-      newProfile,
-    );
+    saveStorage(STORAGE_KEYS.user, newProfile);
 
-    saveStorage(
-      STORAGE_KEYS.role,
-      newRole,
-    );
+    saveStorage(STORAGE_KEYS.role, newRole);
 
-    if (
-      preferredLanguage &&
-      preferredLanguage !== language
-    ) {
-      setLanguageState(
-        preferredLanguage,
-      );
+    if (preferredLanguage && preferredLanguage !== language) {
+      setLanguageState(preferredLanguage);
 
-      saveStorage(
-        STORAGE_KEYS.language,
-        preferredLanguage,
-      );
+      saveStorage(STORAGE_KEYS.language, preferredLanguage);
     }
 
     return newProfile;
   };
+  /* =========================================================
+     FARMER LOGIN
+  ========================================================= */
 
+  const login = async (
+    identifier: string,
+  ): Promise<{
+    success: boolean;
+    user?: UserProfile;
+    message?: string;
+  }> => {
+    const cleanIdentifier = identifier.trim();
+
+    if (!cleanIdentifier) {
+      return {
+        success: false,
+        message: "Please enter your phone number.",
+      };
+    }
+
+    const existingUser = registeredUsers.find(
+      (registeredUser) =>
+        registeredUser.phone === cleanIdentifier ||
+        registeredUser.email?.toLowerCase() === cleanIdentifier.toLowerCase() ||
+        registeredUser.aadhaarNumber === cleanIdentifier,
+    );
+
+    if (!existingUser) {
+      return {
+        success: false,
+        message: "Farmer account not found. Please register first.",
+      };
+    }
+
+    setUser(existingUser);
+
+    setRole(existingUser.role);
+
+    saveStorage(STORAGE_KEYS.user, existingUser);
+
+    saveStorage(STORAGE_KEYS.role, existingUser.role);
+
+    return {
+      success: true,
+      user: existingUser,
+    };
+  };
+
+  /* =========================================================
+     FARMER OTP VERIFICATION
+  ========================================================= */
+  const verifyOTP = async (
+    identifier: string,
+    otp: string,
+  ): Promise<{
+    success: boolean;
+    user?: UserProfile;
+    message?: string;
+  }> => {
+    const cleanIdentifier = identifier.trim();
+    const cleanOTP = otp.trim();
+
+    if (!cleanOTP) {
+      return {
+        success: false,
+        message: "Please enter the OTP.",
+      };
+    }
+
+    // Demo OTP:
+    // Any 6-digit number will be accepted.
+    if (!/^\d{6}$/.test(cleanOTP)) {
+      return {
+        success: false,
+        message: "Please enter a valid 6-digit OTP.",
+      };
+    }
+
+    const existingUser = registeredUsers.find(
+      (registeredUser) =>
+        registeredUser.phone === cleanIdentifier ||
+        registeredUser.email?.toLowerCase() === cleanIdentifier.toLowerCase() ||
+        registeredUser.aadhaarNumber === cleanIdentifier,
+    );
+
+    if (!existingUser) {
+      return {
+        success: false,
+        message: "Farmer account not found. Please register first.",
+      };
+    }
+
+    setUser(existingUser);
+    setRole(existingUser.role);
+
+    saveStorage(STORAGE_KEYS.user, existingUser);
+    saveStorage(STORAGE_KEYS.role, existingUser.role);
+
+    return {
+      success: true,
+      user: existingUser,
+    };
+  };
   /* =========================================================
      LOGIN
   ========================================================= */
@@ -1403,33 +1331,23 @@ export const AuthProvider = ({
     registerUser({
       role: loginRole,
 
-      name:
-        profileData.name ||
-        "KisanSetu User",
+      name: profileData.name || "KisanSetu User",
 
-      phone:
-        profileData.phone || "",
+      phone: profileData.phone || "",
 
-      aadhaarNumber:
-        profileData.aadhaarNumber,
+      aadhaarNumber: profileData.aadhaarNumber,
 
-      village:
-        profileData.village,
+      village: profileData.village,
 
-      district:
-        profileData.district,
+      district: profileData.district,
 
-      landAcres:
-        profileData.landAcres,
+      landAcres: profileData.landAcres,
 
-      primaryCrop:
-        profileData.primaryCrop,
+      primaryCrop: profileData.primaryCrop,
 
-      bankName:
-        profileData.bankName,
+      bankName: profileData.bankName,
 
-      bankAccountLast4:
-        profileData.bankAccountLast4,
+      bankAccountLast4: profileData.bankAccountLast4,
     });
   };
 
@@ -1437,9 +1355,7 @@ export const AuthProvider = ({
      UPDATE USER PROFILE
   ========================================================= */
 
-  const updateUserProfile = (
-    profileData: Partial<UserProfile>,
-  ): void => {
+  const updateUserProfile = (profileData: Partial<UserProfile>): void => {
     if (!user) {
       return;
     }
@@ -1451,24 +1367,14 @@ export const AuthProvider = ({
 
     setUser(updatedUser);
 
-    saveStorage(
-      STORAGE_KEYS.user,
-      updatedUser,
-    );
+    saveStorage(STORAGE_KEYS.user, updatedUser);
 
     setRegisteredUsers((previous) => {
-      const updated = previous.map(
-        (registeredUser) =>
-          registeredUser.id ===
-          updatedUser.id
-            ? updatedUser
-            : registeredUser,
+      const updated = previous.map((registeredUser) =>
+        registeredUser.id === updatedUser.id ? updatedUser : registeredUser,
       );
 
-      saveStorage(
-        STORAGE_KEYS.registeredUsers,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.registeredUsers, updated);
 
       return updated;
     });
@@ -1478,12 +1384,9 @@ export const AuthProvider = ({
      GET REGISTERED USER BY PHONE
   ========================================================= */
 
-  const getRegisteredUserByPhone = (
-    phone: string,
-  ): UserProfile | undefined => {
+  const getRegisteredUserByPhone = (phone: string): UserProfile | undefined => {
     return registeredUsers.find(
-      (registeredUser) =>
-        registeredUser.phone === phone,
+      (registeredUser) => registeredUser.phone === phone,
     );
   };
 
@@ -1491,12 +1394,9 @@ export const AuthProvider = ({
      SWITCH ROLE
   ========================================================= */
 
-  const switchRole = (
-    newRole: UserRole,
-  ): void => {
+  const switchRole = (newRole: UserRole): void => {
     const baseProfile =
-      INITIAL_USER_PROFILES[newRole] ||
-      INITIAL_USER_PROFILES.farmer;
+      INITIAL_USER_PROFILES[newRole] || INITIAL_USER_PROFILES.farmer;
 
     const switchedUser: UserProfile = {
       ...baseProfile,
@@ -1510,15 +1410,9 @@ export const AuthProvider = ({
 
     setUser(switchedUser);
 
-    saveStorage(
-      STORAGE_KEYS.role,
-      newRole,
-    );
+    saveStorage(STORAGE_KEYS.role, newRole);
 
-    saveStorage(
-      STORAGE_KEYS.user,
-      switchedUser,
-    );
+    saveStorage(STORAGE_KEYS.user, switchedUser);
   };
 
   /* =========================================================
@@ -1531,13 +1425,9 @@ export const AuthProvider = ({
     setRole("farmer");
 
     if (typeof window !== "undefined") {
-      localStorage.removeItem(
-        STORAGE_KEYS.user,
-      );
+      localStorage.removeItem(STORAGE_KEYS.user);
 
-      localStorage.removeItem(
-        STORAGE_KEYS.role,
-      );
+      localStorage.removeItem(STORAGE_KEYS.role);
     }
   };
 
@@ -1545,15 +1435,10 @@ export const AuthProvider = ({
      CURRENT CENTER
   ========================================================= */
 
-  const setCurrentCenterId = (
-    id: string,
-  ): void => {
+  const setCurrentCenterId = (id: string): void => {
     setCurrentCenterIdState(id);
 
-    saveStorage(
-      STORAGE_KEYS.currentCenter,
-      id,
-    );
+    saveStorage(STORAGE_KEYS.currentCenter, id);
   };
 
   /* =========================================================
@@ -1569,40 +1454,30 @@ export const AuthProvider = ({
     vehicleNumber?: string;
   }): QueueToken => {
     if (!user) {
-      throw new Error(
-        "You must be logged in to book a slot.",
-      );
+      throw new Error("You must be logged in to book a slot.");
     }
 
     /* =====================================================
        FIND CENTER
     ===================================================== */
 
-    const center = centers.find(
-      (item) =>
-        item.id === slotData.centerId,
-    );
+    const center = centers.find((item) => item.id === slotData.centerId);
 
     if (!center) {
-      throw new Error(
-        "Procurement center not found.",
-      );
+      throw new Error("Procurement center not found.");
     }
 
     /* =====================================================
        FIND EXISTING SLOT
     ===================================================== */
 
-    let selectedSlot =
-      slots.find(
-        (slot) =>
-          slot.centerId ===
-            slotData.centerId &&
-          slot.crop === slotData.crop &&
-          slot.date === slotData.date &&
-          slot.timeWindow ===
-            slotData.timeWindow,
-      );
+    let selectedSlot = slots.find(
+      (slot) =>
+        slot.centerId === slotData.centerId &&
+        slot.crop === slotData.crop &&
+        slot.date === slotData.date &&
+        slot.timeWindow === slotData.timeWindow,
+    );
 
     /* =====================================================
        CREATE SLOT IF NEEDED
@@ -1612,16 +1487,9 @@ export const AuthProvider = ({
       const templateSlot =
         slots.find(
           (slot) =>
-            slot.centerId ===
-              slotData.centerId &&
-            slot.crop ===
-              slotData.crop,
+            slot.centerId === slotData.centerId && slot.crop === slotData.crop,
         ) ||
-        slots.find(
-          (slot) =>
-            slot.centerId ===
-            slotData.centerId,
-        ) ||
+        slots.find((slot) => slot.centerId === slotData.centerId) ||
         slots[0];
 
       if (!templateSlot) {
@@ -1633,9 +1501,7 @@ export const AuthProvider = ({
       const newSlot: ProcurementSlot = {
         ...templateSlot,
 
-        id: `SLOT-${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 7)}`,
+        id: `SLOT-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
 
         centerId: center.id,
 
@@ -1647,8 +1513,7 @@ export const AuthProvider = ({
 
         date: slotData.date,
 
-        timeWindow:
-          slotData.timeWindow,
+        timeWindow: slotData.timeWindow,
 
         bookedSlots: 0,
 
@@ -1656,22 +1521,15 @@ export const AuthProvider = ({
 
         status: "available",
 
-        mspRatePerQuintal:
-          MSP_RATES[slotData.crop],
+        mspRatePerQuintal: MSP_RATES[slotData.crop],
       };
 
       selectedSlot = newSlot;
 
       setSlots((previous) => {
-        const updated = [
-          ...previous,
-          newSlot,
-        ];
+        const updated = [...previous, newSlot];
 
-        saveStorage(
-          STORAGE_KEYS.slots,
-          updated,
-        );
+        saveStorage(STORAGE_KEYS.slots, updated);
 
         return updated;
       });
@@ -1681,13 +1539,8 @@ export const AuthProvider = ({
        CHECK SLOT STATUS
     ===================================================== */
 
-    if (
-      selectedSlot.status === "full" ||
-      selectedSlot.status === "closed"
-    ) {
-      throw new Error(
-        "This procurement slot is full or closed.",
-      );
+    if (selectedSlot.status === "full" || selectedSlot.status === "closed") {
+      throw new Error("This procurement slot is full or closed.");
     }
 
     /* =====================================================
@@ -1696,12 +1549,7 @@ export const AuthProvider = ({
 
     const quantity = Math.max(
       1,
-      Math.min(
-        500,
-        Number(
-          slotData.quantityQuintals,
-        ) || 1,
-      ),
+      Math.min(500, Number(slotData.quantityQuintals) || 1),
     );
 
     /* =====================================================
@@ -1709,12 +1557,9 @@ export const AuthProvider = ({
     ===================================================== */
 
     const remainingCapacity =
-      selectedSlot.totalCapacityQuintals -
-      selectedSlot.bookedCapacityQuintals;
+      selectedSlot.totalCapacityQuintals - selectedSlot.bookedCapacityQuintals;
 
-    if (
-      quantity > remainingCapacity
-    ) {
+    if (quantity > remainingCapacity) {
       throw new Error(
         `Only ${remainingCapacity} quintals capacity is available for this slot.`,
       );
@@ -1724,71 +1569,49 @@ export const AuthProvider = ({
        SLOT COUNT
     ===================================================== */
 
-    if (
-      selectedSlot.bookedSlots >=
-      selectedSlot.totalSlots
-    ) {
-      throw new Error(
-        "No booking slots are available.",
-      );
+    if (selectedSlot.bookedSlots >= selectedSlot.totalSlots) {
+      throw new Error("No booking slots are available.");
     }
 
     /* =====================================================
        MSP
     ===================================================== */
 
-    const mspRate =
-      selectedSlot.mspRatePerQuintal ||
-      MSP_RATES[slotData.crop];
+    const mspRate = selectedSlot.mspRatePerQuintal || MSP_RATES[slotData.crop];
 
-    const estimatedValue =
-      quantity * mspRate;
+    const estimatedValue = quantity * mspRate;
 
     /* =====================================================
        TOKEN NUMBER
     ===================================================== */
 
-    const maxTokenNumber =
-      queueTokens.reduce(
-        (maximum, token) =>
-          Math.max(
-            maximum,
-            Number(
-              token.tokenNumber,
-            ) || 0,
-          ),
-        23,
-      );
+    const maxTokenNumber = queueTokens.reduce(
+      (maximum, token) => Math.max(maximum, Number(token.tokenNumber) || 0),
+      23,
+    );
 
-    const tokenNumber =
-      maxTokenNumber + 1;
+    const tokenNumber = maxTokenNumber + 1;
 
     /* =====================================================
        WAIT TIME
     ===================================================== */
 
-    const estimatedWait =
-      Math.max(
-        0,
-        (tokenNumber -
-          center.currentServingToken) *
-          center.averageProcessingTimeMinutes,
-      );
+    const estimatedWait = Math.max(
+      0,
+      (tokenNumber - center.currentServingToken) *
+        center.averageProcessingTimeMinutes,
+    );
 
     /* =====================================================
        CREATE TOKEN
     ===================================================== */
 
     const token: QueueToken = {
-      id: `QUEUE-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 7)}`,
+      id: `QUEUE-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
 
       tokenNumber,
 
-      tokenCode: `HAR-${String(
-        tokenNumber,
-      ).padStart(3, "0")}`,
+      tokenCode: `HAR-${String(tokenNumber).padStart(3, "0")}`,
 
       farmerId: user.id,
 
@@ -1796,10 +1619,7 @@ export const AuthProvider = ({
 
       farmerPhone: user.phone,
 
-      village:
-        user.village ||
-        user.detailedProfile?.village ||
-        "",
+      village: user.village || user.detailedProfile?.village || "",
 
       centerId: center.id,
 
@@ -1811,26 +1631,21 @@ export const AuthProvider = ({
 
       date: slotData.date,
 
-      timeWindow:
-        slotData.timeWindow,
+      timeWindow: slotData.timeWindow,
 
-      slotTime:
-        slotData.timeWindow,
+      slotTime: slotData.timeWindow,
 
-      vehicleNumber:
-        slotData.vehicleNumber || "",
+      vehicleNumber: slotData.vehicleNumber || "",
 
       status: "waiting",
 
-      estimatedWaitMinutes:
-        estimatedWait,
+      estimatedWaitMinutes: estimatedWait,
 
       mspRate,
 
       estimatedValue,
 
-      createdAt:
-        new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
     /* =====================================================
@@ -1838,15 +1653,9 @@ export const AuthProvider = ({
     ===================================================== */
 
     setQueueTokens((previous) => {
-      const updated = [
-        ...previous,
-        token,
-      ];
+      const updated = [...previous, token];
 
-      saveStorage(
-        STORAGE_KEYS.queueTokens,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.queueTokens, updated);
 
       return updated;
     });
@@ -1855,74 +1664,50 @@ export const AuthProvider = ({
        CURRENT CENTER
     ===================================================== */
 
-    setCurrentCenterIdState(
-      center.id,
-    );
+    setCurrentCenterIdState(center.id);
 
-    saveStorage(
-      STORAGE_KEYS.currentCenter,
-      center.id,
-    );
+    saveStorage(STORAGE_KEYS.currentCenter, center.id);
 
     /* =====================================================
        UPDATE SLOT
     ===================================================== */
 
     setSlots((previous) => {
-      const updated = previous.map(
-        (
-          slot,
-        ): ProcurementSlot => {
-          if (
-            slot.id !==
-            selectedSlot!.id
-          ) {
-            return slot;
-          }
+      const updated = previous.map((slot): ProcurementSlot => {
+        if (slot.id !== selectedSlot!.id) {
+          return slot;
+        }
 
-          const bookedSlots =
-            slot.bookedSlots + 1;
+        const bookedSlots = slot.bookedSlots + 1;
 
-          const bookedCapacityQuintals =
-            slot.bookedCapacityQuintals +
-            quantity;
+        const bookedCapacityQuintals = slot.bookedCapacityQuintals + quantity;
 
-          let status: ProcurementSlot["status"] =
-            "available";
+        let status: ProcurementSlot["status"] = "available";
 
-          if (
-            bookedCapacityQuintals >=
-              slot.totalCapacityQuintals ||
-            bookedSlots >=
-              slot.totalSlots
-          ) {
-            status = "full";
-          } else if (
-            bookedCapacityQuintals >=
-              slot.totalCapacityQuintals *
-                0.75 ||
-            bookedSlots >=
-              slot.totalSlots * 0.75
-          ) {
-            status = "filling_fast";
-          }
+        if (
+          bookedCapacityQuintals >= slot.totalCapacityQuintals ||
+          bookedSlots >= slot.totalSlots
+        ) {
+          status = "full";
+        } else if (
+          bookedCapacityQuintals >= slot.totalCapacityQuintals * 0.75 ||
+          bookedSlots >= slot.totalSlots * 0.75
+        ) {
+          status = "filling_fast";
+        }
 
-          return {
-            ...slot,
+        return {
+          ...slot,
 
-            bookedSlots,
+          bookedSlots,
 
-            bookedCapacityQuintals,
+          bookedCapacityQuintals,
 
-            status,
-          };
-        },
-      );
+          status,
+        };
+      });
 
-      saveStorage(
-        STORAGE_KEYS.slots,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.slots, updated);
 
       return updated;
     });
@@ -1933,31 +1718,19 @@ export const AuthProvider = ({
 
     setCenters((previous) => {
       const updated = previous.map(
-        (
-          item,
-        ): ProcurementCenter =>
+        (item): ProcurementCenter =>
           item.id === center.id
             ? {
                 ...item,
 
-                totalQueueWaiting:
-                  item.totalQueueWaiting +
-                  1,
+                totalQueueWaiting: item.totalQueueWaiting + 1,
 
-                availableSlotsToday:
-                  Math.max(
-                    0,
-                    item.availableSlotsToday -
-                      1,
-                  ),
+                availableSlotsToday: Math.max(0, item.availableSlotsToday - 1),
               }
             : item,
       );
 
-      saveStorage(
-        STORAGE_KEYS.centers,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.centers, updated);
 
       return updated;
     });
@@ -1967,35 +1740,25 @@ export const AuthProvider = ({
     ===================================================== */
 
     setMilestones((previous) => {
-      const now =
-        new Date().toISOString();
+      const now = new Date().toISOString();
 
-      const updated =
-        previous.map<VerificationMilestone>(
-          (milestone) => {
-            if (
-              milestone.stage ===
-              "slot_booked"
-            ) {
-              return {
-                ...milestone,
+      const updated = previous.map<VerificationMilestone>((milestone) => {
+        if (milestone.stage === "slot_booked") {
+          return {
+            ...milestone,
 
-                status: "completed",
+            status: "completed",
 
-                timestamp: now,
+            timestamp: now,
 
-                officerNote: `Slot ${token.tokenCode} booked successfully.`,
-              };
-            }
+            officerNote: `Slot ${token.tokenCode} booked successfully.`,
+          };
+        }
 
-            return milestone;
-          },
-        );
+        return milestone;
+      });
 
-      saveStorage(
-        STORAGE_KEYS.milestones,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.milestones, updated);
 
       return updated;
     });
@@ -2004,40 +1767,28 @@ export const AuthProvider = ({
        NOTIFICATION
     ===================================================== */
 
-    const notification: AppNotification =
-      {
-        id: `NOTIF-${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 7)}`,
+    const notification: AppNotification = {
+      id: `NOTIF-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
 
-        type: "slot",
+      type: "slot",
 
-        title:
-          "Procurement Slot Booked",
+      title: "Procurement Slot Booked",
 
-        message: `Token ${token.tokenCode} booked successfully. Estimated value ₹${Math.round(
-          estimatedValue,
-        ).toLocaleString("en-IN")}.`,
+      message: `Token ${token.tokenCode} booked successfully. Estimated value ₹${Math.round(
+        estimatedValue,
+      ).toLocaleString("en-IN")}.`,
 
-        timestamp:
-          new Date().toISOString(),
+      timestamp: new Date().toISOString(),
 
-        read: false,
+      read: false,
 
-        badge:
-          "BOOKING CONFIRMED",
-      };
+      badge: "BOOKING CONFIRMED",
+    };
 
     setNotifications((previous) => {
-      const updated = [
-        notification,
-        ...previous,
-      ];
+      const updated = [notification, ...previous];
 
-      saveStorage(
-        STORAGE_KEYS.notifications,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
       return updated;
     });
@@ -2051,132 +1802,94 @@ export const AuthProvider = ({
 
   const callNextToken = (): void => {
     const center =
-      centers.find(
-        (item) =>
-          item.id === currentCenterId,
-      ) || centers[0];
+      centers.find((item) => item.id === currentCenterId) || centers[0];
 
     if (!center) {
       return;
     }
 
-    const nextTokenNumber =
-      center.currentServingToken + 1;
+    const nextTokenNumber = center.currentServingToken + 1;
 
-    let calledToken:
-      | QueueToken
-      | undefined;
+    let calledToken: QueueToken | undefined;
 
     setQueueTokens((previous) => {
-      const updated = previous.map(
-        (token): QueueToken => {
-          const tokenCenterId =
-            token.centerId ||
-            "CTR-001";
+      const updated = previous.map((token): QueueToken => {
+        const tokenCenterId = token.centerId || "CTR-001";
 
-          if (
-            tokenCenterId === center.id &&
-            token.tokenNumber ===
-              nextTokenNumber &&
-            token.status === "waiting"
-          ) {
-            const updatedToken: QueueToken =
-              {
-                ...token,
+        if (
+          tokenCenterId === center.id &&
+          token.tokenNumber === nextTokenNumber &&
+          token.status === "waiting"
+        ) {
+          const updatedToken: QueueToken = {
+            ...token,
 
-                status: "called",
+            status: "called",
 
-                calledAt:
-                  new Date().toISOString(),
+            calledAt: new Date().toISOString(),
 
-                estimatedWaitMinutes: 0,
-              };
+            estimatedWaitMinutes: 0,
+          };
 
-            calledToken =
-              updatedToken;
+          calledToken = updatedToken;
 
-            return updatedToken;
-          }
+          return updatedToken;
+        }
 
-          return token;
-        },
-      );
+        return token;
+      });
 
-      saveStorage(
-        STORAGE_KEYS.queueTokens,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.queueTokens, updated);
 
       return updated;
     });
 
     setCenters((previous) => {
       const updated = previous.map(
-        (
-          item,
-        ): ProcurementCenter =>
+        (item): ProcurementCenter =>
           item.id === center.id
             ? {
                 ...item,
 
-                currentServingToken:
-                  nextTokenNumber,
+                currentServingToken: nextTokenNumber,
 
-                totalQueueWaiting:
-                  Math.max(
-                    0,
-                    item.totalQueueWaiting -
-                      (calledToken
-                        ? 1
-                        : 0),
-                  ),
+                totalQueueWaiting: Math.max(
+                  0,
+                  item.totalQueueWaiting - (calledToken ? 1 : 0),
+                ),
               }
             : item,
       );
 
-      saveStorage(
-        STORAGE_KEYS.centers,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.centers, updated);
 
       return updated;
     });
 
     if (calledToken) {
-      const notification: AppNotification =
-        {
-          id: `NOTIF-CALL-${Date.now()}`,
+      const notification: AppNotification = {
+        id: `NOTIF-CALL-${Date.now()}`,
 
-          type: "queue",
+        type: "queue",
 
-          title:
-            "Your Token Is Called",
+        title: "Your Token Is Called",
 
-          message: `Token ${calledToken.tokenCode}, please proceed to the procurement counter.`,
+        message: `Token ${calledToken.tokenCode}, please proceed to the procurement counter.`,
 
-          timestamp:
-            new Date().toISOString(),
+        timestamp: new Date().toISOString(),
 
-          read: false,
+        read: false,
 
-          badge: "YOUR TURN",
-        };
+        badge: "YOUR TURN",
+      };
 
-      setNotifications(
-        (previous) => {
-          const updated = [
-            notification,
-            ...previous,
-          ];
+      setNotifications((previous) => {
+        const updated = [notification, ...previous];
 
-          saveStorage(
-            STORAGE_KEYS.notifications,
-            updated,
-          );
+        saveStorage(STORAGE_KEYS.notifications, updated);
 
-          return updated;
-        },
-      );
+        return updated;
+      });
     }
   };
 
@@ -2190,55 +1903,39 @@ export const AuthProvider = ({
     moisturePercent: number,
     notes: string,
   ): void => {
-    const token =
-      queueTokens.find(
-        (item) =>
-          item.tokenNumber ===
-          tokenNumber,
-      );
+    const token = queueTokens.find((item) => item.tokenNumber === tokenNumber);
 
     if (!token) {
       return;
     }
 
-    const now =
-      new Date().toISOString();
+    const now = new Date().toISOString();
 
-    const updatedReport: QualityReport =
-      {
-        ...qualityReport,
+    const updatedReport: QualityReport = {
+      ...qualityReport,
 
-        sampleId: `SMP-2026-${tokenNumber}`,
+      sampleId: `SMP-2026-${tokenNumber}`,
 
-        testedAt: now,
+      testedAt: now,
 
-        moisturePercent,
+      moisturePercent,
 
-        grade,
+      grade,
 
-        passed:
-          grade !== "Rejected",
+      passed: grade !== "Rejected",
 
-        notes,
-      };
+      notes,
+    };
 
-    setQualityReport(
-      updatedReport,
-    );
+    setQualityReport(updatedReport);
 
-    let tokenGrade:
-      | "Grade A"
-      | "Grade B"
-      | "Standard"
-      | "Pending" = "Pending";
+    let tokenGrade: "Grade A" | "Grade B" | "Standard" | "Pending" = "Pending";
 
     if (grade === "Grade A") {
       tokenGrade = "Grade A";
     } else if (grade === "Grade B") {
       tokenGrade = "Grade B";
-    } else if (
-      grade === "Standard"
-    ) {
+    } else if (grade === "Standard") {
       tokenGrade = "Standard";
     }
 
@@ -2248,26 +1945,19 @@ export const AuthProvider = ({
 
     setQueueTokens((previous) => {
       const updated = previous.map(
-        (
-          item,
-        ): QueueToken =>
-          item.tokenNumber ===
-          tokenNumber
+        (item): QueueToken =>
+          item.tokenNumber === tokenNumber
             ? {
                 ...item,
 
-                qualityGrade:
-                  tokenGrade,
+                qualityGrade: tokenGrade,
 
                 moisturePercent,
               }
             : item,
       );
 
-      saveStorage(
-        STORAGE_KEYS.queueTokens,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.queueTokens, updated);
 
       return updated;
     });
@@ -2277,35 +1967,23 @@ export const AuthProvider = ({
     ===================================================== */
 
     setMilestones((previous) => {
-      const updated =
-        previous.map<VerificationMilestone>(
-          (milestone) => {
-            if (
-              milestone.stage ===
-              "lab_verification"
-            ) {
-              return {
-                ...milestone,
+      const updated = previous.map<VerificationMilestone>((milestone) => {
+        if (milestone.stage === "lab_verification") {
+          return {
+            ...milestone,
 
-                status:
-                  grade === "Rejected"
-                    ? "rejected"
-                    : "completed",
+            status: grade === "Rejected" ? "rejected" : "completed",
 
-                timestamp: now,
+            timestamp: now,
 
-                officerNote: notes,
-              };
-            }
+            officerNote: notes,
+          };
+        }
 
-            return milestone;
-          },
-        );
+        return milestone;
+      });
 
-      saveStorage(
-        STORAGE_KEYS.milestones,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.milestones, updated);
 
       return updated;
     });
@@ -2314,39 +1992,29 @@ export const AuthProvider = ({
        NOTIFICATION
     ===================================================== */
 
-    const notification: AppNotification =
-      {
-        id: `NOTIF-LAB-${Date.now()}`,
+    const notification: AppNotification = {
+      id: `NOTIF-LAB-${Date.now()}`,
 
-        type: "verification",
+      type: "verification",
 
-        title:
-          grade === "Rejected"
-            ? "Quality Test Failed"
-            : "Crop Quality Test Completed",
+      title:
+        grade === "Rejected"
+          ? "Quality Test Failed"
+          : "Crop Quality Test Completed",
 
-        message: `Token ${token.tokenCode} quality inspection completed with ${grade} and ${moisturePercent}% moisture.`,
+      message: `Token ${token.tokenCode} quality inspection completed with ${grade} and ${moisturePercent}% moisture.`,
 
-        timestamp: now,
+      timestamp: now,
 
-        read: false,
+      read: false,
 
-        badge:
-          grade === "Rejected"
-            ? "REJECTED"
-            : "LAB TEST",
-      };
+      badge: grade === "Rejected" ? "REJECTED" : "LAB TEST",
+    };
 
     setNotifications((previous) => {
-      const updated = [
-        notification,
-        ...previous,
-      ];
+      const updated = [notification, ...previous];
 
-      saveStorage(
-        STORAGE_KEYS.notifications,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
       return updated;
     });
@@ -2369,71 +2037,44 @@ export const AuthProvider = ({
     tokenNumber: number,
     finalWeight: number,
   ): void => {
-    const token =
-      queueTokens.find(
-        (item) =>
-          item.tokenNumber ===
-          tokenNumber,
-      );
+    const token = queueTokens.find((item) => item.tokenNumber === tokenNumber);
 
     if (!token) {
       return;
     }
 
-    const safeWeight = Math.max(
-      0,
-      Number(finalWeight) || 0,
-    );
+    const safeWeight = Math.max(0, Number(finalWeight) || 0);
 
-    const mspRate =
-      token.mspRate ??
-      MSP_RATES[token.crop];
+    const mspRate = token.mspRate ?? MSP_RATES[token.crop];
 
-    const grossAmount =
-      safeWeight * mspRate;
+    const grossAmount = safeWeight * mspRate;
 
     const deductions = 0;
 
-    const netPayable =
-      grossAmount - deductions;
+    const netPayable = grossAmount - deductions;
 
     /* =====================================================
        FIND FARMER BANK DETAILS
     ===================================================== */
 
     const farmer =
-      registeredUsers.find(
-        (item) =>
-          item.id ===
-          token.farmerId,
-      ) ||
-      (user?.id === token.farmerId
-        ? user
-        : undefined);
+      registeredUsers.find((item) => item.id === token.farmerId) ||
+      (user?.id === token.farmerId ? user : undefined);
 
     /* =====================================================
        FIND CENTER
     ===================================================== */
 
-    const centerForToken =
-      centers.find(
-        (center) =>
-          center.id ===
-          token.centerId,
-      );
+    const centerForToken = centers.find(
+      (center) => center.id === token.centerId,
+    );
 
     const now = new Date();
 
-    const procuredDate =
-      now
-        .toISOString()
-        .split("T")[0] ?? "";
+    const procuredDate = now.toISOString().split("T")[0] ?? "";
 
     const estimatedReleaseDate =
-      new Date(
-        now.getTime() +
-          2 * 24 * 60 * 60 * 1000,
-      )
+      new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0] ?? "";
 
@@ -2441,66 +2082,50 @@ export const AuthProvider = ({
        CREATE PAYMENT
     ===================================================== */
 
-    const payment: PaymentTransaction =
-      {
-        id: `PAY-${Date.now()}`,
+    const payment: PaymentTransaction = {
+      id: `PAY-${Date.now()}`,
 
-        transactionId:
-          `TXN-KSETU-${Date.now()}`,
+      transactionId: `TXN-KSETU-${Date.now()}`,
 
-        pfmsReferenceNo:
-          `PFMS/WB/${now.getFullYear()}/${Date.now()
-            .toString()
-            .slice(-8)}`,
+      pfmsReferenceNo: `PFMS/WB/${now.getFullYear()}/${Date.now()
+        .toString()
+        .slice(-8)}`,
 
-        farmerId:
-          token.farmerId,
+      farmerId: token.farmerId,
 
-        farmerName:
-          token.farmerName,
+      farmerName: token.farmerName,
 
-        tokenNumber:
-          token.tokenNumber,
+      tokenNumber: token.tokenNumber,
 
-        centerName:
-          token.centerName ??
-          centerForToken?.name ??
-          "Procurement Center",
+      centerName:
+        token.centerName ?? centerForToken?.name ?? "Procurement Center",
 
-        crop: token.crop,
+      crop: token.crop,
 
-        grossWeightQuintals:
-          safeWeight,
+      grossWeightQuintals: safeWeight,
 
-        mspRatePerQuintal:
-          mspRate,
+      mspRatePerQuintal: mspRate,
 
-        grossAmount,
+      grossAmount,
 
-        deductions,
+      deductions,
 
-        netPayable,
+      netPayable,
 
-        status: "Initiated",
+      status: "Initiated",
 
-        statusStageIndex: 0,
+      statusStageIndex: 0,
 
-        bankName:
-          farmer?.bankName ??
-          "Bank Account",
+      bankName: farmer?.bankName ?? "Bank Account",
 
-        accountLast4:
-          farmer?.bankAccountLast4 ??
-          "----",
+      accountLast4: farmer?.bankAccountLast4 ?? "----",
 
-        ifscCode:
-          farmer?.ifscCode ??
-          "N/A",
+      ifscCode: farmer?.ifscCode ?? "N/A",
 
-        procuredDate,
+      procuredDate,
 
-        estimatedReleaseDate,
-      };
+      estimatedReleaseDate,
+    };
 
     /* =====================================================
        SAVE PAYMENT
@@ -2513,18 +2138,13 @@ export const AuthProvider = ({
         ...previous.filter(
           (item) =>
             !(
-              item.tokenNumber ===
-                tokenNumber &&
-              item.farmerId ===
-                token.farmerId
+              item.tokenNumber === tokenNumber &&
+              item.farmerId === token.farmerId
             ),
         ),
       ];
 
-      saveStorage(
-        STORAGE_KEYS.payments,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.payments, updated);
 
       return updated;
     });
@@ -2535,35 +2155,25 @@ export const AuthProvider = ({
 
     setQueueTokens((previous) => {
       const updated = previous.map(
-        (
-          item,
-        ): QueueToken =>
-          item.tokenNumber ===
-          tokenNumber
+        (item): QueueToken =>
+          item.tokenNumber === tokenNumber
             ? {
                 ...item,
 
                 status: "completed",
 
-                weighbridgeWeightQuintals:
-                  safeWeight,
+                weighbridgeWeightQuintals: safeWeight,
 
-                finalWeight:
-                  safeWeight,
+                finalWeight: safeWeight,
 
-                paymentAmount:
-                  netPayable,
+                paymentAmount: netPayable,
 
-                completedAt:
-                  new Date().toISOString(),
+                completedAt: new Date().toISOString(),
               }
             : item,
       );
 
-      saveStorage(
-        STORAGE_KEYS.queueTokens,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.queueTokens, updated);
 
       return updated;
     });
@@ -2572,95 +2182,67 @@ export const AuthProvider = ({
        UPDATE MILESTONES
     ===================================================== */
 
-    setMilestones((previous) => {
-      const updated =
-        previous.map(
-          (milestone) => {
-            if (
-              milestone.tokenNumber !==
-              tokenNumber
-            ) {
-              return milestone;
-            }
+    setMilestones((previous): VerificationMilestone[] => {
+      const updated = previous.map((milestone): VerificationMilestone => {
+        if (
+          milestone.stage !== "weighbridge" &&
+          milestone.stage !== "procurement_approved" &&
+          milestone.stage !== "payment_processing"
+        ) {
+          return milestone;
+        }
 
-            if (
-              milestone.key ===
-                "weighbridge" ||
-              milestone.key ===
-                "procurement_approved"
-            ) {
-              return {
-                ...milestone,
+        if (
+          milestone.stage === "weighbridge" ||
+          milestone.stage === "procurement_approved"
+        ) {
+          return {
+            ...milestone,
+            status: "completed",
+            timestamp: new Date().toISOString(),
+          };
+        }
 
-                status: "completed",
+        if (milestone.stage === "payment_processing") {
+          return {
+            ...milestone,
+            status: "in_progress",
+          };
+        }
 
-                completedAt:
-                  new Date().toISOString(),
-              };
-            }
+        return milestone;
+      });
 
-            if (
-              milestone.key ===
-              "payment_processing"
-            ) {
-              return {
-                ...milestone,
-
-                status:
-                  "in_progress",
-              };
-            }
-
-            return milestone;
-          },
-        );
-
-      saveStorage(
-        STORAGE_KEYS.milestones,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.milestones, updated);
 
       return updated;
     });
-
     /* =====================================================
        PAYMENT NOTIFICATION
     ===================================================== */
 
-    const notification: AppNotification =
-      {
-        id: `NOTIF-PAY-${Date.now()}`,
+    const notification: AppNotification = {
+      id: `NOTIF-PAY-${Date.now()}`,
 
-        type: "payment",
+      type: "payment",
 
-        title:
-          "Procurement Payment Initiated",
+      title: "Procurement Payment Initiated",
 
-        message: `Payment of ₹${Math.round(
-          netPayable,
-        ).toLocaleString(
-          "en-IN",
-        )} has been initiated for token ${token.tokenCode}.`,
+      message: `Payment of ₹${Math.round(netPayable).toLocaleString(
+        "en-IN",
+      )} has been initiated for token ${token.tokenCode}.`,
 
-        timestamp:
-          new Date().toISOString(),
+      timestamp: new Date().toISOString(),
 
-        read: false,
+      read: false,
 
-        badge:
-          "PAYMENT INITIATED",
-      };
+      badge: "PAYMENT INITIATED",
+    };
 
     setNotifications((previous) => {
-      const updated = [
-        notification,
-        ...previous,
-      ];
+      const updated = [notification, ...previous];
 
-      saveStorage(
-        STORAGE_KEYS.notifications,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
       return updated;
     });
@@ -2670,16 +2252,11 @@ export const AuthProvider = ({
      MARK NOTIFICATION READ
   ========================================================= */
 
-  const markNotificationRead = (
-    notificationId: string,
-  ): void => {
+  const markNotificationRead = (notificationId: string): void => {
     setNotifications((previous) => {
       const updated = previous.map(
-        (
-          notification,
-        ): AppNotification =>
-          notification.id ===
-          notificationId
+        (notification): AppNotification =>
+          notification.id === notificationId
             ? {
                 ...notification,
 
@@ -2688,10 +2265,7 @@ export const AuthProvider = ({
             : notification,
       );
 
-      saveStorage(
-        STORAGE_KEYS.notifications,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
       return updated;
     });
@@ -2701,46 +2275,33 @@ export const AuthProvider = ({
      MARK ALL NOTIFICATIONS READ
   ========================================================= */
 
-  const markAllNotificationsRead =
-    (): void => {
-      setNotifications((previous) => {
-        const updated = previous.map(
-          (
-            notification,
-          ): AppNotification => ({
-            ...notification,
+  const markAllNotificationsRead = (): void => {
+    setNotifications((previous) => {
+      const updated = previous.map(
+        (notification): AppNotification => ({
+          ...notification,
 
-            read: true,
-          }),
-        );
+          read: true,
+        }),
+      );
 
-        saveStorage(
-          STORAGE_KEYS.notifications,
-          updated,
-        );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
-        return updated;
-      });
-    };
+      return updated;
+    });
+  };
 
   /* =========================================================
      DELETE NOTIFICATION
   ========================================================= */
 
-  const deleteNotification = (
-    notificationId: string,
-  ): void => {
+  const deleteNotification = (notificationId: string): void => {
     setNotifications((previous) => {
       const updated = previous.filter(
-        (notification) =>
-          notification.id !==
-          notificationId,
+        (notification) => notification.id !== notificationId,
       );
 
-      saveStorage(
-        STORAGE_KEYS.notifications,
-        updated,
-      );
+      saveStorage(STORAGE_KEYS.notifications, updated);
 
       return updated;
     });
@@ -2750,23 +2311,14 @@ export const AuthProvider = ({
      QUEUE ANNOUNCEMENT
   ========================================================= */
 
-  const playQueueAnnouncement = (
-    tokenNumber: number,
-  ): void => {
-    if (
-      typeof window ===
-        "undefined" ||
-      !window.speechSynthesis
-    ) {
+  const playQueueAnnouncement = (tokenNumber: number): void => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
       return;
     }
 
     const message = `Token number ${tokenNumber}, please proceed to the procurement counter.`;
 
-    const utterance =
-      new SpeechSynthesisUtterance(
-        message,
-      );
+    const utterance = new SpeechSynthesisUtterance(message);
 
     utterance.rate = 0.9;
 
@@ -2774,85 +2326,81 @@ export const AuthProvider = ({
 
     window.speechSynthesis.cancel();
 
-    window.speechSynthesis.speak(
-      utterance,
-    );
+    window.speechSynthesis.speak(utterance);
   };
 
   /* =========================================================
      CONTEXT VALUE
   ========================================================= */
 
-  const contextValue: AuthContextType =
-    {
-      user,
+  const contextValue: AuthContextType = {
+    user,
 
-      role,
+    role,
 
-      isAuthenticated:
-        Boolean(user),
+    isAuthenticated: Boolean(user),
 
-      language,
+    language,
 
-      deleteNotification,
+    deleteNotification,
 
-      t,
+    t,
 
-      setLanguage,
+    setLanguage,
 
-      switchRole,
+    switchRole,
 
-      loginWithProfile,
+    loginWithProfile,
 
-      updateUserProfile,
+    login,
 
-      registerUser,
+    verifyOTP,
 
-      getRegisteredUserByPhone,
+    updateUserProfile,
 
-      registeredUsers,
+    registerUser,
 
-      logout,
+    getRegisteredUserByPhone,
 
-      centers,
+    registeredUsers,
 
-      slots,
+    logout,
 
-      queueTokens,
+    centers,
 
-      currentCenterId,
+    slots,
 
-      setCurrentCenterId,
+    queueTokens,
 
-      qualityReport,
+    currentCenterId,
 
-      milestones,
+    setCurrentCenterId,
 
-      payments,
+    qualityReport,
 
-      notifications,
+    milestones,
 
-      bookNewSlot,
+    payments,
 
-      callNextToken,
+    notifications,
 
-      completeInspection,
+    bookNewSlot,
 
-      approveProcurementAndWeigh,
+    callNextToken,
 
-      markNotificationRead,
+    completeInspection,
 
-      markAllNotificationsRead,
+    approveProcurementAndWeigh,
 
-      playQueueAnnouncement,
-    };
+    markNotificationRead,
+
+    markAllNotificationsRead,
+
+    playQueueAnnouncement,
+  };
 
   return (
-    <AuthContext.Provider
-      value={contextValue}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
@@ -2860,18 +2408,14 @@ export const AuthProvider = ({
    USE AUTH
 ========================================================= */
 
-export const useAuth =
-  (): AuthContextType => {
-    const context =
-      useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
 
-    if (!context) {
-      throw new Error(
-        "useAuth must be used inside an AuthProvider",
-      );
-    }
+  if (!context) {
+    throw new Error("useAuth must be used inside an AuthProvider");
+  }
 
-    return context;
-  };
+  return context;
+};
 
 export default AuthContext;

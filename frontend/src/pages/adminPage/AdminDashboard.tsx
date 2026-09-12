@@ -132,8 +132,7 @@ interface DashboardSummary {
    CONFIG
 ========================================================= */
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 /* =========================================================
    HELPERS
@@ -160,30 +159,23 @@ const getAdminToken = () => {
   return null;
 };
 
-const adminFetch = async (
-  endpoint: string,
-  options: RequestInit = {}
-) => {
+const adminFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAdminToken();
 
-  const response = await fetch(
-    `${API_BASE_URL}${endpoint}`,
-    {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : {}),
-        ...(options.headers || {}),
-      },
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {}),
+      ...(options.headers || {}),
+    },
+  });
 
-  const contentType =
-    response.headers.get("content-type") || "";
+  const contentType = response.headers.get("content-type") || "";
 
   const data = contentType.includes("application/json")
     ? await response.json()
@@ -195,7 +187,7 @@ const adminFetch = async (
         ? data
         : data?.message ||
             data?.error ||
-            `Request failed with status ${response.status}`
+            `Request failed with status ${response.status}`,
     );
   }
 
@@ -203,9 +195,7 @@ const adminFetch = async (
 };
 
 const formatNumber = (value: number) => {
-  return new Intl.NumberFormat("en-IN").format(
-    Math.round(value || 0)
-  );
+  return new Intl.NumberFormat("en-IN").format(Math.round(value || 0));
 };
 
 const formatCurrency = (value: number) => {
@@ -293,8 +283,7 @@ const getStatusStyle = (status?: string) => {
   ) {
     return {
       label: status || "Completed",
-      className:
-        "bg-emerald-50 text-emerald-700 ring-emerald-100",
+      className: "bg-emerald-50 text-emerald-700 ring-emerald-100",
       dot: "bg-emerald-500",
     };
   }
@@ -306,8 +295,7 @@ const getStatusStyle = (status?: string) => {
   ) {
     return {
       label: status || "Rejected",
-      className:
-        "bg-red-50 text-red-700 ring-red-100",
+      className: "bg-red-50 text-red-700 ring-red-100",
       dot: "bg-red-500",
     };
   }
@@ -321,16 +309,14 @@ const getStatusStyle = (status?: string) => {
   ) {
     return {
       label: status || "Processing",
-      className:
-        "bg-amber-50 text-amber-700 ring-amber-100",
+      className: "bg-amber-50 text-amber-700 ring-amber-100",
       dot: "bg-amber-500",
     };
   }
 
   return {
     label: status || "Recorded",
-    className:
-      "bg-slate-50 text-slate-600 ring-slate-200",
+    className: "bg-slate-50 text-slate-600 ring-slate-200",
     dot: "bg-slate-400",
   };
 };
@@ -456,22 +442,18 @@ const StatCard: React.FC<StatCardProps> = ({
 const AdminDashboard: React.FC = () => {
   const { centers } = useAuth();
 
-  const [dashboard, setDashboard] =
-    useState<DashboardSummary | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
 
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [queueTokens, setQueueTokens] =
-    useState<QueueToken[]>([]);
-  const [auditLogs, setAuditLogs] =
-    useState<AuditLog[]>([]);
+  const [queueTokens, setQueueTokens] = useState<QueueToken[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [lastUpdated, setLastUpdated] =
-    useState<Date | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   /* =========================================================
      FETCH DATA
@@ -501,38 +483,18 @@ const AdminDashboard: React.FC = () => {
         dashboardResponse?.data ||
           dashboardResponse?.dashboard ||
           dashboardResponse ||
-          null
+          null,
       );
 
-      setFarmers(
-        farmersResponse?.farmers ||
-          farmersResponse?.data ||
-          []
-      );
+      setFarmers(farmersResponse?.farmers || farmersResponse?.data || []);
 
-      setBookings(
-        bookingsResponse?.bookings ||
-          bookingsResponse?.data ||
-          []
-      );
+      setBookings(bookingsResponse?.bookings || bookingsResponse?.data || []);
 
-      setPayments(
-        paymentsResponse?.payments ||
-          paymentsResponse?.data ||
-          []
-      );
+      setPayments(paymentsResponse?.payments || paymentsResponse?.data || []);
 
-      setQueueTokens(
-        queueResponse?.tokens ||
-          queueResponse?.data ||
-          []
-      );
+      setQueueTokens(queueResponse?.tokens || queueResponse?.data || []);
 
-      setAuditLogs(
-        auditResponse?.logs ||
-          auditResponse?.data ||
-          []
-      );
+      setAuditLogs(auditResponse?.logs || auditResponse?.data || []);
 
       setLastUpdated(new Date());
     } catch (err) {
@@ -541,7 +503,7 @@ const AdminDashboard: React.FC = () => {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to load admin dashboard data."
+          : "Unable to load admin dashboard data.",
       );
     } finally {
       setLoading(false);
@@ -569,7 +531,7 @@ const AdminDashboard: React.FC = () => {
         Number(
           booking.approvedQuantityQuintals ??
             booking.submittedQuantityQuintals ??
-            0
+            0,
         )
       );
     }, 0);
@@ -582,42 +544,28 @@ const AdminDashboard: React.FC = () => {
   }, [payments]);
 
   const activeTokens = useMemo(() => {
-    const activeStatuses = [
-      "waiting",
-      "next",
-      "arrived",
-      "processing",
-    ];
+    const activeStatuses = ["waiting", "next", "arrived", "processing"];
 
     return queueTokens.filter((token) =>
-      activeStatuses.includes(
-        token.status?.toLowerCase() || ""
-      )
+      activeStatuses.includes(token.status?.toLowerCase() || ""),
     ).length;
   }, [queueTokens]);
 
   const acceptedProcurements = useMemo(() => {
     return bookings.filter(
-      (booking) =>
-        booking.status?.toLowerCase() === "accepted"
+      (booking) => booking.status?.toLowerCase() === "accepted",
     ).length;
   }, [bookings]);
 
   const averageWaitTime = useMemo(() => {
     const values = queueTokens
-      .map((token) =>
-        Number(token.estimatedWaitMinutes)
-      )
-      .filter(
-        (value) =>
-          Number.isFinite(value) && value > 0
-      );
+      .map((token) => Number(token.estimatedWaitMinutes))
+      .filter((value) => Number.isFinite(value) && value > 0);
 
     if (!values.length) return 0;
 
     return Math.round(
-      values.reduce((sum, value) => sum + value, 0) /
-        values.length
+      values.reduce((sum, value) => sum + value, 0) / values.length,
     );
   }, [queueTokens]);
 
@@ -655,24 +603,18 @@ const AdminDashboard: React.FC = () => {
       grouped[key].quantity += Number(
         booking.approvedQuantityQuintals ??
           booking.submittedQuantityQuintals ??
-          0
+          0,
       );
 
       grouped[key].bookings += 1;
     });
 
     return Object.values(grouped)
-      .sort(
-        (a, b) =>
-          new Date(a.date).getTime() -
-          new Date(b.date).getTime()
-      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-7)
       .map((item) => ({
         ...item,
-        label: new Date(
-          `${item.date}T00:00:00`
-        ).toLocaleDateString("en-IN", {
+        label: new Date(`${item.date}T00:00:00`).toLocaleDateString("en-IN", {
           day: "2-digit",
           month: "short",
         }),
@@ -694,7 +636,7 @@ const AdminDashboard: React.FC = () => {
         Number(
           booking.approvedQuantityQuintals ??
             booking.submittedQuantityQuintals ??
-            0
+            0,
         );
     });
 
@@ -725,13 +667,11 @@ const AdminDashboard: React.FC = () => {
 
     farmers.forEach((farmer) => {
       if (farmer.farmerId && farmer.district) {
-        farmerDistrictMap[farmer.farmerId] =
-          farmer.district;
+        farmerDistrictMap[farmer.farmerId] = farmer.district;
       }
 
       if (farmer._id && farmer.district) {
-        farmerDistrictMap[farmer._id] =
-          farmer.district;
+        farmerDistrictMap[farmer._id] = farmer.district;
       }
     });
 
@@ -739,15 +679,14 @@ const AdminDashboard: React.FC = () => {
 
     bookings.forEach((booking) => {
       const district =
-        farmerDistrictMap[booking.farmerId || ""] ||
-        "Unspecified";
+        farmerDistrictMap[booking.farmerId || ""] || "Unspecified";
 
       grouped[district] =
         (grouped[district] || 0) +
         Number(
           booking.approvedQuantityQuintals ??
             booking.submittedQuantityQuintals ??
-            0
+            0,
         );
     });
 
@@ -769,7 +708,7 @@ const AdminDashboard: React.FC = () => {
       .sort(
         (a, b) =>
           new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
+          new Date(a.createdAt || 0).getTime(),
       )
       .slice(0, 6);
   }, [bookings]);
@@ -783,7 +722,7 @@ const AdminDashboard: React.FC = () => {
       .sort(
         (a, b) =>
           new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
+          new Date(a.createdAt || 0).getTime(),
       )
       .slice(0, 5);
   }, [queueTokens]);
@@ -797,7 +736,7 @@ const AdminDashboard: React.FC = () => {
       .sort(
         (a, b) =>
           new Date(b.timestamp || 0).getTime() -
-          new Date(a.timestamp || 0).getTime()
+          new Date(a.timestamp || 0).getTime(),
       )
       .slice(0, 5);
   }, [auditLogs]);
@@ -815,10 +754,7 @@ const AdminDashboard: React.FC = () => {
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
               {Array.from({ length: 5 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="h-36 rounded-3xl bg-white"
-                />
+                <div key={index} className="h-36 rounded-3xl bg-white" />
               ))}
             </div>
 
@@ -853,8 +789,7 @@ const AdminDashboard: React.FC = () => {
                   </h2>
 
                   <p className="mt-1 text-xs text-red-600">
-                    The administration APIs could not be
-                    loaded.
+                    The administration APIs could not be loaded.
                   </p>
                 </div>
               </div>
@@ -900,7 +835,6 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-[calc(100vh-76px)] bg-[#F5F7F3]">
       <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 xl:px-10">
-
         {/* TOP HEADER */}
 
         <section
@@ -945,9 +879,7 @@ const AdminDashboard: React.FC = () => {
 
               <ChevronRight className="h-3 w-3" />
 
-              <span className="text-emerald-600">
-                Operations Dashboard
-              </span>
+              <span className="text-emerald-600">Operations Dashboard</span>
             </div>
 
             <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -987,9 +919,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                  State agricultural procurement overview
-                  across farmers, mandi centers, crop
-                  procurement, payments and queue operations.
+                  State agricultural procurement overview across farmers, mandi
+                  centers, crop procurement, payments and queue operations.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -1003,9 +934,7 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-500">
                     <Database className="h-3.5 w-3.5 text-slate-400" />
                     {lastUpdated
-                      ? `Synced ${formatTime(
-                          lastUpdated.toISOString()
-                        )}`
+                      ? `Synced ${formatTime(lastUpdated.toISOString())}`
                       : "Data synchronized"}
                   </div>
                 </div>
@@ -1041,9 +970,7 @@ const AdminDashboard: React.FC = () => {
                     }`}
                   />
 
-                  {refreshing
-                    ? "Refreshing"
-                    : "Refresh data"}
+                  {refreshing ? "Refreshing" : "Refresh data"}
                 </button>
 
                 <button
@@ -1076,9 +1003,7 @@ const AdminDashboard: React.FC = () => {
         <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <StatCard
             title="Registered Farmers"
-            value={formatNumber(
-              dashboard?.totalFarmers ?? farmers.length
-            )}
+            value={formatNumber(dashboard?.totalFarmers ?? farmers.length)}
             subtitle="Farmer records in system"
             icon={Users}
             accent="bg-emerald-500"
@@ -1088,7 +1013,7 @@ const AdminDashboard: React.FC = () => {
             title="Grain Procured"
             value={`${formatNumber(totalProcured)} qtl`}
             subtitle={`${formatNumber(
-              acceptedProcurements
+              acceptedProcurements,
             )} accepted procurements`}
             icon={Wheat}
             accent="bg-lime-500"
@@ -1097,9 +1022,7 @@ const AdminDashboard: React.FC = () => {
           <StatCard
             title="DBT Disbursed"
             value={formatCurrency(totalPaymentsAmount)}
-            subtitle={`${formatNumber(
-              payments.length
-            )} payment records`}
+            subtitle={`${formatNumber(payments.length)} payment records`}
             icon={CircleDollarSign}
             accent="bg-teal-500"
           />
@@ -1107,9 +1030,7 @@ const AdminDashboard: React.FC = () => {
           <StatCard
             title="Active Queue"
             value={formatNumber(activeTokens)}
-            subtitle={`${formatNumber(
-              queueTokens.length
-            )} total token records`}
+            subtitle={`${formatNumber(queueTokens.length)} total token records`}
             icon={Clock3}
             accent="bg-amber-500"
           />
@@ -1173,9 +1094,7 @@ const AdminDashboard: React.FC = () => {
               </p>
 
               <p className="text-sm font-black text-slate-800">
-                {averageWaitTime
-                  ? `${averageWaitTime} min`
-                  : "—"}
+                {averageWaitTime ? `${averageWaitTime} min` : "—"}
               </p>
             </div>
 
@@ -1204,7 +1123,6 @@ const AdminDashboard: React.FC = () => {
         {/* CHARTS */}
 
         <section className="mt-5 grid gap-5 xl:grid-cols-3">
-
           {/* Procurement Trend */}
 
           <div className="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.045)] sm:p-6 xl:col-span-2">
@@ -1234,10 +1152,7 @@ const AdminDashboard: React.FC = () => {
 
             <div className="mt-7 h-61.25">
               {dailyTrend.length ? (
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={dailyTrend}
                     margin={{
@@ -1301,14 +1216,11 @@ const AdminDashboard: React.FC = () => {
                       contentStyle={{
                         borderRadius: 16,
                         border: "1px solid #E2E8F0",
-                        boxShadow:
-                          "0 15px 40px rgba(15,23,42,0.10)",
+                        boxShadow: "0 15px 40px rgba(15,23,42,0.10)",
                         fontSize: 12,
                       }}
                       formatter={(value) => [
-                        `${formatNumber(
-                          Number(value ?? 0)
-                        )} qtl`,
+                        `${formatNumber(Number(value ?? 0))} qtl`,
                         "Procurement",
                       ]}
                     />
@@ -1338,8 +1250,7 @@ const AdminDashboard: React.FC = () => {
                     </p>
 
                     <p className="mt-1 text-[10px] text-slate-400">
-                      Records will appear here when bookings
-                      are available.
+                      Records will appear here when bookings are available.
                     </p>
                   </div>
                 </div>
@@ -1368,10 +1279,7 @@ const AdminDashboard: React.FC = () => {
 
             <div className="mt-4 h-61.25">
               {cropDistribution.length ? (
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={cropDistribution}
@@ -1383,28 +1291,19 @@ const AdminDashboard: React.FC = () => {
                       dataKey="value"
                       stroke="none"
                     >
-                      {cropDistribution.map(
-                        (_, index) => (
-                          <Cell
-                            key={`crop-${index}`}
-                            fill={
-                              cropColors[
-                                index %
-                                  cropColors.length
-                              ]
-                            }
-                          />
-                        )
-                      )}
+                      {cropDistribution.map((_, index) => (
+                        <Cell
+                          key={`crop-${index}`}
+                          fill={cropColors[index % cropColors.length]}
+                        />
+                      ))}
                     </Pie>
 
                     {/* FIXED TOOLTIP */}
 
                     <Tooltip
                       formatter={(value) => [
-                        `${formatNumber(
-                          Number(value ?? 0)
-                        )} qtl`,
+                        `${formatNumber(Number(value ?? 0))} qtl`,
                         "Quantity",
                       ]}
                       contentStyle={{
@@ -1425,47 +1324,35 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              {cropDistribution
-                .slice(0, 5)
-                .map((crop, index) => {
-                  const total = cropDistribution.reduce(
-                    (sum, item) =>
-                      sum + item.value,
-                    0
-                  );
+              {cropDistribution.slice(0, 5).map((crop, index) => {
+                const total = cropDistribution.reduce(
+                  (sum, item) => sum + item.value,
+                  0,
+                );
 
-                  const percentage = total
-                    ? Math.round(
-                        (crop.value / total) * 100
-                      )
-                    : 0;
+                const percentage = total
+                  ? Math.round((crop.value / total) * 100)
+                  : 0;
 
-                  return (
-                    <div
-                      key={crop.name}
-                      className="flex items-center gap-2"
-                    >
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                          backgroundColor:
-                            cropColors[
-                              index %
-                                cropColors.length
-                            ],
-                        }}
-                      />
+                return (
+                  <div key={crop.name} className="flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{
+                        backgroundColor: cropColors[index % cropColors.length],
+                      }}
+                    />
 
-                      <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-600">
-                        {crop.name}
-                      </span>
+                    <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-600">
+                      {crop.name}
+                    </span>
 
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {percentage}%
-                      </span>
-                    </div>
-                  );
-                })}
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {percentage}%
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -1485,8 +1372,7 @@ const AdminDashboard: React.FC = () => {
                 </h2>
 
                 <p className="text-[10px] font-medium text-slate-400">
-                  Actual procurement volume mapped to farmer
-                  districts
+                  Actual procurement volume mapped to farmer districts
                 </p>
               </div>
             </div>
@@ -1498,10 +1384,7 @@ const AdminDashboard: React.FC = () => {
 
           <div className="mt-6 h-70">
             {districtPerformance.length ? (
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-              >
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={districtPerformance}
                   layout="vertical"
@@ -1543,9 +1426,7 @@ const AdminDashboard: React.FC = () => {
 
                   <Tooltip
                     formatter={(value) => [
-                      `${formatNumber(
-                        Number(value ?? 0)
-                      )} qtl`,
+                      `${formatNumber(Number(value ?? 0))} qtl`,
                       "Procurement",
                     ]}
                     contentStyle={{
@@ -1576,7 +1457,6 @@ const AdminDashboard: React.FC = () => {
         {/* LOWER OPERATIONS */}
 
         <section className="mt-5 grid gap-5 xl:grid-cols-3">
-
           {/* Recent Procurement */}
 
           <div className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.045)] xl:col-span-2">
@@ -1631,16 +1511,13 @@ const AdminDashboard: React.FC = () => {
                 <tbody>
                   {recentBookings.length ? (
                     recentBookings.map((booking) => {
-                      const status = getStatusStyle(
-                        booking.status
-                      );
+                      const status = getStatusStyle(booking.status);
 
-                      const quantity =
-                        Number(
-                          booking.approvedQuantityQuintals ??
-                            booking.submittedQuantityQuintals ??
-                            0
-                        );
+                      const quantity = Number(
+                        booking.approvedQuantityQuintals ??
+                          booking.submittedQuantityQuintals ??
+                          0,
+                      );
 
                       return (
                         <tr
@@ -1650,15 +1527,13 @@ const AdminDashboard: React.FC = () => {
                           <td className="px-5 py-4">
                             <div>
                               <p className="max-w-45 truncate text-xs font-bold text-slate-800">
-                                {booking.farmerName ||
-                                  "Unknown farmer"}
+                                {booking.farmerName || "Unknown farmer"}
                               </p>
 
                               <p className="mt-0.5 text-[10px] text-slate-400">
                                 {booking.tokenNumber
                                   ? `Token ${booking.tokenNumber}`
-                                  : booking.farmerId ||
-                                    "—"}
+                                  : booking.farmerId || "—"}
                               </p>
                             </div>
                           </td>
@@ -1670,9 +1545,7 @@ const AdminDashboard: React.FC = () => {
                               </p>
 
                               <p className="mt-0.5 text-[10px] text-slate-400">
-                                {booking.variety ||
-                                  booking.centerName ||
-                                  "—"}
+                                {booking.variety || booking.centerName || "—"}
                               </p>
                             </div>
                           </td>
@@ -1707,15 +1580,11 @@ const AdminDashboard: React.FC = () => {
                           <td className="px-5 py-4">
                             <div>
                               <p className="text-[10px] font-semibold text-slate-500">
-                                {getTimeAgo(
-                                  booking.createdAt
-                                )}
+                                {getTimeAgo(booking.createdAt)}
                               </p>
 
                               <p className="mt-0.5 text-[9px] text-slate-400">
-                                {formatDate(
-                                  booking.createdAt
-                                )}
+                                {formatDate(booking.createdAt)}
                               </p>
                             </div>
                           </td>
@@ -1768,9 +1637,7 @@ const AdminDashboard: React.FC = () => {
             <div className="divide-y divide-slate-50">
               {recentQueue.length ? (
                 recentQueue.map((token) => {
-                  const status = getStatusStyle(
-                    token.status
-                  );
+                  const status = getStatusStyle(token.status);
 
                   return (
                     <div
@@ -1779,21 +1646,17 @@ const AdminDashboard: React.FC = () => {
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-[10px] font-black text-white">
-                          {token.tokenNumber ||
-                            token.tokenCode ||
-                            "—"}
+                          {token.tokenNumber || token.tokenCode || "—"}
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-xs font-bold text-slate-800">
-                            {token.farmerName ||
-                              "Unknown farmer"}
+                            {token.farmerName || "Unknown farmer"}
                           </p>
 
                           <div className="mt-1 flex items-center gap-2">
                             <span className="text-[10px] text-slate-400">
-                              {token.crop ||
-                                "Crop not specified"}
+                              {token.crop || "Crop not specified"}
                             </span>
 
                             <span className="h-1 w-1 rounded-full bg-slate-300" />
@@ -1818,11 +1681,7 @@ const AdminDashboard: React.FC = () => {
 
                             {token.estimatedWaitMinutes ? (
                               <span className="text-[9px] font-semibold text-slate-400">
-                                ~
-                                {
-                                  token.estimatedWaitMinutes
-                                }{" "}
-                                min
+                                ~{token.estimatedWaitMinutes} min
                               </span>
                             ) : null}
                           </div>
@@ -1907,98 +1766,83 @@ const AdminDashboard: React.FC = () => {
 
               <tbody>
                 {centers?.length ? (
-                  centers.slice(0, 10).map(
-                    (center: any, index: number) => {
-                      const centerName =
-                        center.name ||
-                        center.centerName ||
-                        center.centerId ||
-                        `Mandi Center ${index + 1}`;
+                  centers.slice(0, 10).map((center: any, index: number) => {
+                    const centerName =
+                      center.name ||
+                      center.centerName ||
+                      center.centerId ||
+                      `Mandi Center ${index + 1}`;
 
-                      const centerId =
-                        center._id ||
-                        center.centerId ||
-                        center.id ||
-                        "";
+                    const centerId =
+                      center._id || center.centerId || center.id || "";
 
-                      const centerQueue =
-                        queueTokens.filter(
-                          (token) =>
-                            token.centerId === centerId
-                        ).length;
+                    const centerQueue = queueTokens.filter(
+                      (token) => token.centerId === centerId,
+                    ).length;
 
-                      const centerBookings =
-                        bookings.filter(
-                          (booking) =>
-                            booking.centerId === centerId
-                        ).length;
+                    const centerBookings = bookings.filter(
+                      (booking) => booking.centerId === centerId,
+                    ).length;
 
-                      return (
-                        <tr
-                          key={
-                            centerId ||
-                            `${centerName}-${index}`
-                          }
-                          className="border-b border-slate-50 transition-colors hover:bg-slate-50/60"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                                <Building2 className="h-4 w-4" />
-                              </div>
-
-                              <div>
-                                <p className="text-xs font-bold text-slate-800">
-                                  {centerName}
-                                </p>
-
-                                <p className="mt-0.5 text-[9px] text-slate-400">
-                                  {center.centerCode ||
-                                    centerId ||
-                                    "Center"}
-                                </p>
-                              </div>
+                    return (
+                      <tr
+                        key={centerId || `${centerName}-${index}`}
+                        className="border-b border-slate-50 transition-colors hover:bg-slate-50/60"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                              <Building2 className="h-4 w-4" />
                             </div>
-                          </td>
 
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-1.5">
-                              <MapPin className="h-3 w-3 text-slate-300" />
+                            <div>
+                              <p className="text-xs font-bold text-slate-800">
+                                {centerName}
+                              </p>
 
-                              <span className="text-[10px] font-semibold text-slate-500">
-                                {center.district ||
-                                  center.location ||
-                                  center.address ||
-                                  "Location available"}
-                              </span>
+                              <p className="mt-0.5 text-[9px] text-slate-400">
+                                {center.centerCode || centerId || "Center"}
+                              </p>
                             </div>
-                          </td>
+                          </div>
+                        </td>
 
-                          <td className="px-6 py-4">
-                            <span className="text-xs font-black text-slate-800">
-                              {formatNumber(centerQueue)}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="h-3 w-3 text-slate-300" />
+
+                            <span className="text-[10px] font-semibold text-slate-500">
+                              {center.district ||
+                                center.location ||
+                                center.address ||
+                                "Location available"}
                             </span>
+                          </div>
+                        </td>
 
-                            <span className="ml-1 text-[9px] text-slate-400">
-                              tokens
-                            </span>
-                          </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-black text-slate-800">
+                            {formatNumber(centerQueue)}
+                          </span>
 
-                          <td className="px-6 py-4">
-                            <span className="text-xs font-black text-slate-800">
-                              {formatNumber(
-                                centerBookings
-                              )}
-                            </span>
+                          <span className="ml-1 text-[9px] text-slate-400">
+                            tokens
+                          </span>
+                        </td>
 
-                            <span className="ml-1 text-[9px] text-slate-400">
-                              records
-                            </span>
-                          </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-black text-slate-800">
+                            {formatNumber(centerBookings)}
+                          </span>
 
-                          <td className="px-6 py-4">
-                            <span
-                              className="
+                          <span className="ml-1 text-[9px] text-slate-400">
+                            records
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span
+                            className="
                                 inline-flex
                                 items-center gap-1.5
                                 rounded-full
@@ -2010,22 +1854,17 @@ const AdminDashboard: React.FC = () => {
                                 ring-1
                                 ring-emerald-100
                               "
-                            >
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-
-                              Data available
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    }
-                  )
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            Data available
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-12 text-center"
-                    >
+                    <td colSpan={5} className="px-6 py-12 text-center">
                       <Building2 className="mx-auto h-7 w-7 text-slate-300" />
 
                       <p className="mt-3 text-xs font-bold text-slate-500">
@@ -2033,8 +1872,7 @@ const AdminDashboard: React.FC = () => {
                       </p>
 
                       <p className="mt-1 text-[10px] text-slate-400">
-                        Center information will appear when
-                        configured.
+                        Center information will appear when configured.
                       </p>
                     </td>
                   </tr>
@@ -2047,7 +1885,6 @@ const AdminDashboard: React.FC = () => {
         {/* AUDIT + SYSTEM SUMMARY */}
 
         <section className="mt-5 grid gap-5 lg:grid-cols-3">
-
           {/* Audit */}
 
           <div className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.045)] lg:col-span-2">
@@ -2077,10 +1914,7 @@ const AdminDashboard: React.FC = () => {
               {recentAuditLogs.length ? (
                 recentAuditLogs.map((log, index) => (
                   <div
-                    key={
-                      log.logId ||
-                      `${log.timestamp}-${index}`
-                    }
+                    key={log.logId || `${log.timestamp}-${index}`}
                     className="flex gap-3 px-5 py-4 sm:px-6"
                   >
                     <div className="relative flex flex-col items-center">
@@ -2088,8 +1922,7 @@ const AdminDashboard: React.FC = () => {
                         <ShieldCheck className="h-3.5 w-3.5" />
                       </div>
 
-                      {index <
-                        recentAuditLogs.length - 1 && (
+                      {index < recentAuditLogs.length - 1 && (
                         <div className="absolute top-9 h-full w-px bg-slate-100" />
                       )}
                     </div>
@@ -2097,8 +1930,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="min-w-0 flex-1 pb-1">
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-xs font-bold text-slate-800">
-                          {log.action ||
-                            "Administrative activity"}
+                          {log.action || "Administrative activity"}
                         </p>
 
                         <span className="text-[9px] font-medium text-slate-400">
@@ -2169,9 +2001,8 @@ const AdminDashboard: React.FC = () => {
                 </h2>
 
                 <p className="mt-2 text-[11px] leading-5 text-slate-400">
-                  Centralized monitoring of agricultural
-                  procurement operations and administrative
-                  activity.
+                  Centralized monitoring of agricultural procurement operations
+                  and administrative activity.
                 </p>
 
                 <div className="mt-6 space-y-2">
@@ -2231,20 +2062,13 @@ const AdminDashboard: React.FC = () => {
         {/* FOOTER SUMMARY */}
 
         <div className="mt-6 flex flex-col gap-2 border-t border-slate-200/70 py-5 text-[10px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            KisanSetu Administration • Agricultural
-            Procurement Management
-          </p>
+          <p>KisanSetu Administration • Agricultural Procurement Management</p>
 
           <div className="flex items-center gap-2">
-            <span>
-              Last synchronization:
-            </span>
+            <span>Last synchronization:</span>
 
             <span className="font-bold text-slate-500">
-              {lastUpdated
-                ? lastUpdated.toLocaleString("en-IN")
-                : "—"}
+              {lastUpdated ? lastUpdated.toLocaleString("en-IN") : "—"}
             </span>
           </div>
         </div>
